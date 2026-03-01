@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClaimsService, Claim } from '../../core/claims.service';
 import { NotificationsService } from '../../core/notifications.service';
+import { NotificationBellComponent } from '../../shared/components/notification-bell.component';
 
 @Component({
   selector: 'app-claims-officer-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NotificationBellComponent],
   template: `
     <section class="max-w-5xl mx-auto px-4 py-8 md:py-10">
       <div class="flex items-center justify-between gap-4 mb-6">
@@ -18,6 +19,9 @@ import { NotificationsService } from '../../core/notifications.service';
           <p class="text-xs md:text-sm text-slate-500 mt-1 dark:text-slate-400">
             Review pending claims, verify eligibility, and approve or reject payouts.
           </p>
+        </div>
+        <div class="flex items-center gap-4">
+          <app-notification-bell></app-notification-bell>
         </div>
       </div>
 
@@ -127,7 +131,7 @@ export class ClaimsOfficerDashboardComponent implements OnInit {
         next: () => {
           this.notifications.show({
             title: accepted ? 'Claim approved' : 'Claim rejected',
-            detail: `Claim #${id} processed.`,
+            message: `Claim #${id} processed.`,
             type: accepted ? 'success' : 'info',
           });
           this.loadPending();

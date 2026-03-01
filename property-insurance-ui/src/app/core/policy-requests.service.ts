@@ -10,7 +10,7 @@ export interface PropertyPlan {
   coverageRate: number;
   basePremium: number;
   agentCommission: number;
-  frequency: string;
+  frequency: string | number;
 }
 
 export interface PolicyRequest {
@@ -24,6 +24,14 @@ export interface PolicyRequest {
   installmentCount?: number;
   installmentAmount?: number;
   agentCommissionAmount?: number;
+  adminNotes?: string;
+  propertyAddress?: string;
+  propertyValue?: number;
+  propertyAge?: number;
+  customer?: {
+    fullName: string;
+    email: string;
+  } | null;
   plan?: {
     planName: string;
   } | null;
@@ -70,11 +78,14 @@ export class PolicyRequestsService {
     return this.http.get<PolicyRequest[]>(this.baseUrl + '/admin/pending');
   }
 
-  assignAgent(requestId: number, agentId: number): Observable<string> {
+  assignAgent(requestId: number, agentId: number, adminNotes?: string): Observable<string> {
     return this.http.put(
       `${this.baseUrl}/${requestId}/assign-agent/${agentId}`,
-      {},
-      { responseType: 'text' },
+      JSON.stringify(adminNotes || ''),
+      {
+        headers: { 'Content-Type': 'application/json' },
+        responseType: 'text'
+      },
     ) as Observable<string>;
   }
 
@@ -129,6 +140,12 @@ export class PolicyRequestsService {
   getAgentApproved(): Observable<PolicyRequest[]> {
     return this.http.get<PolicyRequest[]>(
       this.baseUrl + '/agent/approved',
+    );
+  }
+
+  getAgentAssigned(): Observable<PolicyRequest[]> {
+    return this.http.get<PolicyRequest[]>(
+      this.baseUrl + '/agent/assigned',
     );
   }
 }

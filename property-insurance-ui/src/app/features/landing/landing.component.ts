@@ -24,17 +24,15 @@ interface RoleCard {
       <div class="landing-grid gap-10 items-start">
         <div class="space-y-6">
           <p class="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-200 mb-2">
-            End-to-end Property Insurance Management
+            Enterprise Property Insurance Administration System
           </p>
           <h1 class="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-            Manage property policies, premiums, and claims
-            <span class="block text-emerald-600 dark:text-emerald-300">with role-based control.</span>
+            Optimize policy, premium, and claims management
+
+            <span class="block text-emerald-600 dark:text-emerald-300">through enterprise role-based governance.</span>
           </h1>
           <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 max-w-xl">
-            A secure, workflow-driven Property Insurance Management System for
-            Admins, Agents, Customers, and Claims Officers. Track policy requests,
-            calculate premiums, and process claims with full auditability.
-          </p>
+            A complete digital platform designed to streamline property insurance operations. Manage policies, assess risks, calculate premiums, and process claims efficiently through a secure and transparent workflow.          </p>
           <div class="flex flex-wrap items-center gap-3 pt-2">
             <a
               routerLink="/login"
@@ -55,16 +53,16 @@ interface RoleCard {
           </div>
           <div class="mt-6 grid gap-4 text-xs text-slate-600 sm:grid-cols-3 dark:text-slate-300">
             <div class="flex flex-col gap-1">
-              <span class="font-semibold text-slate-900 dark:text-slate-100">Secure JWT Login</span>
-              <span>Backed by ASP.NET Core authentication with role-based access.</span>
+              <span class="font-semibold text-slate-900 dark:text-slate-100">⚡ Workflow Automation</span>
+              <span>Streamlined policy approval and claim processing.</span>
             </div>
             <div class="flex flex-col gap-1">
-              <span class="font-semibold text-slate-900 dark:text-slate-100">Policy Workflow</span>
-              <span>From customer request to admin approval and premium invoicing.</span>
+              <span class="font-semibold text-slate-900 dark:text-slate-100">📄 Document Management</span>
+              <span>Secure storage of policy and claim documents.</span>
             </div>
             <div class="flex flex-col gap-1">
-              <span class="font-semibold text-slate-900 dark:text-slate-100">Claims Handling</span>
-              <span>File claims, verify as Claims Officer, and auto-generate invoices.</span>
+              <span class="font-semibold text-slate-900 dark:text-slate-100">💰 Invoice & Payment Tracking</span>
+              <span>Track billing, payments, and policy status.</span>
             </div>
           </div>
         </div>
@@ -103,10 +101,8 @@ interface RoleCard {
             About the platform
           </h2>
           <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">
-            The Property Insurance Management System streamlines end-to-end policy
-            management for a multi-role environment. It enables policy creation,
-            risk assessment, claims verification, and invoice tracking in one
-            cohesive workflow.
+            Our Property Insurance Management System provides a centralized environment to manage the entire insurance lifecycle. 
+            The platform supports administrators, agents, customers, and claims officers with dedicated workflows to ensure efficiency, security, and transparency.
           </p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-4 text-[11px] text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
@@ -127,29 +123,286 @@ interface RoleCard {
       </h2>
       <div class="mt-4 grid gap-3 md:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-white p-4 text-[11px] text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
-          <p class="font-semibold text-slate-900 dark:text-slate-100">Role-based access</p>
-          <p class="mt-1">Granular access controls tailored for each stakeholder.</p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100">Property Insurance Coverage</p>
+          <p class="mt-1">Protect residential and commercial properties against unexpected risks.s</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 text-[11px] text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
-          <p class="font-semibold text-slate-900 dark:text-slate-100">Risk analytics</p>
-          <p class="mt-1">Automated risk scoring with premium and commission insights.</p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100">Risk Assessment</p>
+          <p class="mt-1">Evaluate property risks using structured assessment methods.</p>
         </div>
         <div class="rounded-xl border border-slate-200 bg-white p-4 text-[11px] text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
-          <p class="font-semibold text-slate-900 dark:text-slate-100">Claims workflow</p>
-          <p class="mt-1">Streamlined approval and invoice generation after verification.</p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100">Claims Management</p>
+          <p class="mt-1">Simple and transparent claim submission and verification process.</p>
         </div>
       </div>
     </section>
 
-    <section id="location" class="max-w-6xl mx-auto px-4 py-12">
-      <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50">
-        Location & outreach
-      </h2>
-      <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">
-        Location details and branch coverage will be added here. This section can
-        include offices, contact channels, and service regions as needed.
+<section id="location" class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50">
+    Location & Outreach
+  </h2>
+
+  <div class="mt-6 grid gap-6 md:grid-cols-2">
+
+    <!-- Contact Details -->
+    <div class="space-y-4">
+      <p class="text-sm text-slate-600 dark:text-slate-300">
+        Visit our office or reach out through our support channels. We provide
+        assistance for policy management, claims processing, and customer support.
       </p>
-    </section>
+
+      <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+        <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          📍 Office Address
+        </p>
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          Property Insurance Management Office<br>
+          Financial District, Hyderabad<br>
+          Telangana, India
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+        <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          📞 Phone
+        </p>
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          +91 98765 43210
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+        <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          ✉ Email
+        </p>
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          support@propertyinsurance.com
+        </p>
+      </div>
+    </div>
+
+    <!-- Google Map -->
+    <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+      <iframe
+        src="https://maps.google.com/maps?q=Hyderabad&t=&z=13&ie=UTF8&iwloc=&output=embed"
+        width="100%"
+        height="320"
+        style="border:0;"
+        loading="lazy"
+      ></iframe>
+    </div>
+
+  </div>
+</section>
+
+
+<section id="testimonials" class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50">
+    Customer Testimonials
+  </h2>
+
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+
+    <!-- Testimonial 1 -->
+    <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+      
+      <!-- Stars -->
+      <div class="flex text-yellow-400 mb-2">
+        ★★★★★
+      </div>
+
+      <p class="text-sm text-slate-600 dark:text-slate-300">
+        "The platform makes policy management simple and transparent.
+        The workflow is smooth and secure."
+      </p>
+
+      <p class="mt-3 text-xs font-semibold text-slate-900 dark:text-slate-100">
+        — Rajesh Kumar
+      </p>
+      <p class="text-xs text-slate-500">Customer</p>
+    </div>
+
+    <!-- Testimonial 2 -->
+    <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+
+      <div class="flex text-yellow-400 mb-2">
+        ★★★★★
+      </div>
+
+      <p class="text-sm text-slate-600 dark:text-slate-300">
+        "Efficient system for handling claims and verifying incidents.
+        Saves significant processing time."
+      </p>
+
+      <p class="mt-3 text-xs font-semibold text-slate-900 dark:text-slate-100">
+        — Priya Sharma
+      </p>
+      <p class="text-xs text-slate-500">Claims Officer</p>
+    </div>
+
+    <!-- Testimonial 3 -->
+    <div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+
+      <div class="flex text-yellow-400 mb-2">
+        ★★★★★
+      </div>
+
+      <p class="text-sm text-slate-600 dark:text-slate-300">
+        "Helps us manage policies and assist customers efficiently
+        with clear premium calculations."
+      </p>
+
+      <p class="mt-3 text-xs font-semibold text-slate-900 dark:text-slate-100">
+        — Arjun Reddy
+      </p>
+      <p class="text-xs text-slate-500">Insurance Agent</p>
+    </div>
+
+  </div>
+</section>
+<section id="feedback" class="max-w-6xl mx-auto px-4 py-12">
+  <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50">
+    Customer Feedback & Trust
+  </h2>
+
+  <div class="mt-8 grid gap-10 md:grid-cols-2">
+
+    <!-- LEFT SIDE — Trust / Stats / Partners -->
+    <div class="space-y-6">
+
+      <div>
+        <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          Trusted Insurance Platform
+        </h3>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Our platform helps organizations and individuals manage property insurance
+          efficiently through secure workflows, risk analytics, and transparent claims
+          processing.
+        </p>
+      </div>
+
+      <!-- Analytics Stats -->
+      <div class="grid grid-cols-2 gap-4">
+
+        <div class="rounded-xl border border-slate-200 p-4 text-center dark:border-slate-800">
+          <p class="text-2xl font-bold text-emerald-600">10K+</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300">Customers Served</p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 p-4 text-center dark:border-slate-800">
+          <p class="text-2xl font-bold text-emerald-600">25K+</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300">Policies Managed</p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 p-4 text-center dark:border-slate-800">
+          <p class="text-2xl font-bold text-emerald-600">8K+</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300">Claims Processed</p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 p-4 text-center dark:border-slate-800">
+          <p class="text-2xl font-bold text-emerald-600">99%</p>
+          <p class="text-xs text-slate-600 dark:text-slate-300">Customer Satisfaction</p>
+        </div>
+
+      </div>
+
+      <!-- Partner Companies -->
+      <div>
+        <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          Our Trusted Partners
+        </h3>
+
+        <div class="mt-3 grid grid-cols-3 gap-3 text-center">
+
+          <div class="rounded-lg border border-slate-200 py-3 text-xs dark:border-slate-800">
+            LIC
+          </div>
+
+          <div class="rounded-lg border border-slate-200 py-3 text-xs dark:border-slate-800">
+            HDFC Life
+          </div>
+
+          <div class="rounded-lg border border-slate-200 py-3 text-xs dark:border-slate-800">
+            Tata Consultancy Services
+          </div>
+
+          <div class="rounded-lg border border-slate-200 py-3 text-xs dark:border-slate-800">
+            HDFC Ergo
+          </div>
+
+          <div class="rounded-lg border border-slate-200 py-3 text-xs dark:border-slate-800">
+            CoverPlus
+          </div>
+
+          <div class="rounded-lg border border-slate-200 py-3 text-xs dark:border-slate-800">
+            Star Health 
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE — Feedback Form -->
+    <div class="max-w-lg rounded-2xl border border-slate-200 p-6 dark:border-slate-800">
+
+      <form class="space-y-4">
+
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">
+            Name
+          </label>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">
+            Email
+          </label>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+          />
+        </div>
+
+        <!-- Rating -->
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+            Rating
+          </label>
+          <div class="flex gap-2 text-2xl text-yellow-400">
+            ★★★★★
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">
+            Message
+          </label>
+          <textarea
+            rows="4"
+            placeholder="Write your feedback..."
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+          ></textarea>
+        </div>
+
+        <button
+          type="button"
+          class="w-full rounded-lg bg-emerald-500 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400 transition"
+        >
+          Submit Feedback
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</section>
 
     <section id="roles" class="max-w-6xl mx-auto px-4 py-12">
       <div
@@ -192,6 +445,7 @@ interface RoleCard {
         </div>
       </div>
     </section>
+    
   `,
 })
 export class LandingComponent {

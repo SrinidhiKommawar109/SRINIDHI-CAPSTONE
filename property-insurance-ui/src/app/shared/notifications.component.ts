@@ -18,8 +18,8 @@ import { NotificationsService } from '../core/notifications.service';
         }"
       >
         <div class="font-semibold">{{ msg.title }}</div>
-        <div *ngIf="msg.detail" class="text-[10px] opacity-90">
-          {{ msg.detail }}
+        <div *ngIf="msg.message" class="text-[10px] opacity-90">
+          {{ msg.message }}
         </div>
       </div>
     </div>

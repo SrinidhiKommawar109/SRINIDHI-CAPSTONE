@@ -19,5 +19,17 @@ export class AdminService {
   getAgents(): Observable<AgentSummary[]> {
     return this.http.get<AgentSummary[]>(this.baseUrl + '/agents');
   }
+
+  getCategories(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/Category`);
+  }
+
+  addPlan(plan: any): Observable<any> {
+    return this.http.post(`${environment.apiBaseUrl}/Category/add-plan`, plan);
+  }
+
+  getStats(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/stats`);
+  }
 }
 
