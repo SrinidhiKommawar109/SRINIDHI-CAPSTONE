@@ -1,13 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from './core/theme.service';
 import { NotificationsComponent } from './shared/notifications.component';
+import { NotificationBellComponent } from './shared/components/notification-bell.component';
 import { AuthService } from './core/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NotificationsComponent, CommonModule],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, NotificationsComponent, CommonModule, NotificationBellComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -15,18 +17,19 @@ export class App {
   protected readonly title = signal('property-insurance-ui');
   private readonly themeService = inject(ThemeService);
   private readonly authService = inject(AuthService);
-  themeMode = this.themeService.getCurrent();
+
+  themeMode = this.themeService.mode;
   isLoggedIn = signal(this.authService.isLoggedIn());
+  mobileMenuOpen = signal(false);
 
   constructor() {
-    this.themeService.apply(this.themeMode);
     this.authService.authState$.subscribe((state) => {
       this.isLoggedIn.set(state);
     });
   }
 
   toggleTheme(): void {
-    this.themeMode = this.themeService.toggle();
+    this.themeService.toggle();
   }
 
   logout(): void {

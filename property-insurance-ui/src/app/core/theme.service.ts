@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -8,7 +8,14 @@ export type ThemeMode = 'light' | 'dark';
 export class ThemeService {
   private readonly storageKey = 'pis_theme';
 
-  getCurrent(): ThemeMode {
+  private modeSignal = signal<ThemeMode>(this.getInitialTheme());
+  readonly mode = this.modeSignal.asReadonly();
+
+  constructor() {
+    this.apply(this.modeSignal());
+  }
+
+  private getInitialTheme(): ThemeMode {
     const saved = localStorage.getItem(this.storageKey) as ThemeMode | null;
     return saved === 'light' || saved === 'dark' ? saved : 'dark';
   }
@@ -21,12 +28,17 @@ export class ThemeService {
       root.classList.remove('dark');
     }
     localStorage.setItem(this.storageKey, mode);
+    this.modeSignal.set(mode);
   }
 
   toggle(): ThemeMode {
-    const next = this.getCurrent() === 'dark' ? 'light' : 'dark';
+    const next = this.modeSignal() === 'dark' ? 'light' : 'dark';
     this.apply(next);
     return next;
+  }
+
+  getCurrent(): ThemeMode {
+    return this.modeSignal();
   }
 }
 

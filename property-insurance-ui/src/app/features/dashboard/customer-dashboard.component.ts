@@ -10,12 +10,11 @@ import {
 import { ClaimsService, CreateClaimPayload } from '../../core/claims.service';
 import { InvoicesService, Invoice } from '../../core/invoices.service';
 import { NotificationsService } from '../../core/notifications.service';
-import { NotificationBellComponent } from '../../shared/components/notification-bell.component';
 
 @Component({
   selector: 'app-customer-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, NotificationBellComponent],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       <!-- Sidebar -->
@@ -74,9 +73,6 @@ import { NotificationBellComponent } from '../../shared/components/notification-
             <p class="text-sm text-slate-500 mt-2 dark:text-slate-400">
               {{ getViewSubtitle() }}
             </p>
-          </div>
-          <div class="flex items-center gap-4">
-            <app-notification-bell></app-notification-bell>
           </div>
 
           <!-- Browse Policies View -->

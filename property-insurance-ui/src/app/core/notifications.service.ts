@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, interval, switchMap, startWith, filter, map } from 'rxjs';
+import { BehaviorSubject, interval, switchMap, startWith, filter, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -29,9 +29,15 @@ export class NotificationsService {
 
   constructor() {
     // Start polling when user is logged in
+    this.auth.authState$.pipe(
+      filter(isLoggedIn => isLoggedIn),
+      startWith(this.auth.isLoggedIn()),
+      filter(isLoggedIn => isLoggedIn),
+      switchMap(() => this.fetchNotifications().pipe(startWith(null)))
+    ).subscribe();
+
     interval(30000) // 30 seconds
       .pipe(
-        startWith(0),
         filter(() => this.auth.isLoggedIn()),
         switchMap(() => this.fetchNotifications())
       )
@@ -60,14 +66,20 @@ export class NotificationsService {
 
   // Keep for local-only immediate UI feedback if needed
   show(message: { title: string; message?: string; type: 'success' | 'error' | 'info' }): void {
-    // Optional: Temporarily add to list or just use as transient toast
-    console.log('Local notification:', message);
+    const newMsg: NotificationMessage = {
+      id: Date.now(), // Temporary ID for local messages
+      title: message.title,
+      message: message.message || '',
+      type: message.type,
+      isRead: false,
+      createdAt: new Date().toISOString()
+    };
+
+    const current = this.messagesSubject.value;
+    this.messagesSubject.next([newMsg, ...current]);
   }
 
   dismiss(id: number): void {
     this.markAsRead(id);
   }
 }
-
-import { tap } from 'rxjs';
-

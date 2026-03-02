@@ -7,12 +7,11 @@ import {
 } from '../../core/policy-requests.service';
 import { AdminService, AgentSummary } from '../../core/admin.service';
 import { NotificationsService } from '../../core/notifications.service';
-import { NotificationBellComponent } from '../../shared/components/notification-bell.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, NotificationBellComponent],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       <!-- Sidebar -->
@@ -24,7 +23,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
               (click)="activeView = 'managePlans'"
               [class.bg-slate-100]="activeView === 'managePlans'"
               [class.text-slate-900]="activeView === 'managePlans'"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Add & Browse policies
@@ -33,7 +32,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
               (click)="activeView = 'assignAgents'"
               [class.bg-slate-100]="activeView === 'assignAgents'"
               [class.text-slate-900]="activeView === 'assignAgents'"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
               Assign Agents
@@ -42,7 +41,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
               (click)="activeView = 'approvals'"
               [class.bg-slate-100]="activeView === 'approvals'"
               [class.text-slate-900]="activeView === 'approvals'"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               Policy Approval
@@ -51,7 +50,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
               (click)="activeView = 'analytics'"
               [class.bg-slate-100]="activeView === 'analytics'"
               [class.text-slate-900]="activeView === 'analytics'"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
               Analytics
@@ -65,15 +64,12 @@ import { NotificationBellComponent } from '../../shared/components/notification-
         <section class="max-w-6xl mx-auto px-6 py-8 md:py-12">
           <!-- Header Section -->
           <div class="mb-10">
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
               {{ getViewTitle() }}
             </h1>
-            <p class="text-sm text-slate-500 mt-2 dark:text-slate-400">
+            <p class="text-sm text-slate-500 mt-2 dark:text-slate-300">
               {{ getViewSubtitle() }}
             </p>
-          </div>
-          <div class="flex items-center gap-4">
-            <app-notification-bell></app-notification-bell>
           </div>
 
           <!-- Manage Plans View -->
@@ -92,7 +88,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
 
             <!-- Add Plan Form -->
             <div *ngIf="showAddPlanForm" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <h2 class="text-sm font-semibold text-slate-900 mb-4 dark:text-slate-50">Create New Plan</h2>
+              <h2 class="text-sm font-semibold text-slate-900 mb-4 dark:text-white">Create New Plan</h2>
               <div class="grid gap-4 md:grid-cols-2">
                 <div class="space-y-1.5">
                   <label class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Plan Name</label>
@@ -219,10 +215,10 @@ import { NotificationBellComponent } from '../../shared/components/notification-
                       <ng-container *ngFor="let cat of categories">
                         <ng-container *ngFor="let sub of cat.subCategories">
                           <tr *ngFor="let plan of sub.plans" class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{{ plan.planName }}</td>
-                            <td class="px-6 py-4">\${{ plan.basePremium | number: '1.2-2' }}</td>
-                            <td class="px-6 py-4">\${{ plan.baseCoverageAmount | number: '1.0-0' }}</td>
-                            <td class="px-6 py-4">{{ getFrequencyLabel(plan.frequency) }}</td>
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">{{ plan.planName }}</td>
+                            <td class="px-6 py-4 dark:text-slate-200">\${{ plan.basePremium | number: '1.2-2' }}</td>
+                            <td class="px-6 py-4 dark:text-slate-200">\${{ plan.baseCoverageAmount | number: '1.0-0' }}</td>
+                            <td class="px-6 py-4 dark:text-slate-200">{{ getFrequencyLabel(plan.frequency) }}</td>
                           </tr>
                         </ng-container>
                       </ng-container>
@@ -236,7 +232,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
           <!-- Assign Agents View -->
           <div *ngIf="activeView === 'assignAgents'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Pending Agent Assignments</h2>
+              <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Pending Agent Assignments</h2>
               <button
                 type="button"
                 class="rounded-full border border-slate-300 px-3 py-1 text-[11px] hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900"
@@ -258,7 +254,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
                 class="rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700 space-y-3 dark:border-slate-800 dark:bg-slate-900"
               >
                 <div class="flex items-center justify-between">
-                  <span class="font-bold text-slate-900 dark:text-slate-50">Request #{{ req.id }}</span>
+                  <span class="font-bold text-slate-900 dark:text-white">Request #{{ req.id }}</span>
                   <span class="rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                     {{ req.status }}
                   </span>
@@ -303,7 +299,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
           <!-- Policy Approval View -->
           <div *ngIf="activeView === 'approvals'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Requests Waiting for Final Approval</h2>
+              <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Requests Waiting for Final Approval</h2>
               <button
                 type="button"
                 class="rounded-full border border-slate-300 px-3 py-1 text-[11px] hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900"
@@ -324,7 +320,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
                 class="rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700 space-y-3 dark:border-slate-800 dark:bg-slate-900"
               >
                 <div class="flex items-center justify-between">
-                  <span class="font-bold text-slate-900 dark:text-slate-50">Request #{{ req.id }}</span>
+                  <span class="font-bold text-slate-900 dark:text-white">Request #{{ req.id }}</span>
                   <span class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                     {{ req.status }}
                   </span>
@@ -353,11 +349,11 @@ import { NotificationBellComponent } from '../../shared/components/notification-
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Total Customers</p>
-                <p class="text-2xl font-bold text-slate-900 dark:text-slate-50">{{ stats?.totalCustomers || 0 }}</p>
+                <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ stats?.totalCustomers || 0 }}</p>
               </div>
               <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Active Agents</p>
-                <p class="text-2xl font-bold text-slate-900 dark:text-slate-50">{{ stats?.totalAgents || 0 }}</p>
+                <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ stats?.totalAgents || 0 }}</p>
               </div>
               <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Policies Sold</p>
@@ -371,12 +367,12 @@ import { NotificationBellComponent } from '../../shared/components/notification-
 
             <div class="grid gap-8 md:grid-cols-2">
               <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <h3 class="text-sm font-semibold text-slate-900 mb-6 dark:text-slate-100">Most Popular Plans</h3>
+                <h3 class="text-sm font-semibold text-slate-900 mb-6 dark:text-white">Most Popular Plans</h3>
                 <div class="space-y-4">
                   <div *ngFor="let plan of stats?.topPlans" class="space-y-1">
                     <div class="flex items-center justify-between text-xs">
                       <span class="text-slate-700 dark:text-slate-300">{{ plan.planName }}</span>
-                      <span class="font-bold text-slate-900 dark:text-slate-50">{{ plan.count }} sold</span>
+                      <span class="font-bold text-slate-900 dark:text-white">{{ plan.count }} sold</span>
                     </div>
                     <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden dark:bg-slate-800">
                       <div class="h-full bg-emerald-500 rounded-full" [style.width.%]="(plan.count / stats.totalPolicies) * 100"></div>
@@ -392,7 +388,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
                 <div class="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-4 dark:bg-slate-800">
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 </div>
-                <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">System Health</h3>
+                <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-1">System Health</h3>
                 <p class="text-xs text-slate-500 max-w-[200px]">All insurance modules (API, Claims, Payments) are operating normally.</p>
               </div>
             </div>

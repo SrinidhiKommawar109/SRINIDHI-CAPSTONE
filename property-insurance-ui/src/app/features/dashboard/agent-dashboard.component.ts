@@ -6,12 +6,10 @@ import {
   PolicyRequest,
 } from '../../core/policy-requests.service';
 import { NotificationsService } from '../../core/notifications.service';
-import { NotificationBellComponent } from '../../shared/components/notification-bell.component';
-
 @Component({
   selector: 'app-agent-dashboard',
   standalone: true,
-  imports: [CommonModule, NotificationBellComponent],
+  imports: [CommonModule],
   template: `
     <section class="max-w-6xl mx-auto px-4 py-8 md:py-10">
       <div class="flex items-center justify-between gap-4 mb-8">
@@ -24,7 +22,6 @@ import { NotificationBellComponent } from '../../shared/components/notification-
           </p>
         </div>
         <div class="flex items-center gap-4">
-          <app-notification-bell></app-notification-bell>
           <button
             (click)="loadAssignedRequests()"
             class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"

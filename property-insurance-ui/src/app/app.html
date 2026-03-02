@@ -1,156 +1,278 @@
-<div class="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50">
-  <header class="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/60">
-    <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-      <div class="flex items-center gap-2">
-        <div class="h-9 w-9 rounded-xl bg-linear-to-tr from-sky-500 to-emerald-400 flex items-center justify-center text-lg font-semibold text-slate-950">
-          PI
-        </div>
-        <div>
-          <div class="text-sm font-semibold tracking-wide uppercase text-slate-700 dark:text-slate-200">
-            Property Insurance System
-          </div>
-          <div class="text-xs text-slate-500 dark:text-slate-400">
-            Secure multi-role policy management
-          </div>
-        </div>
+<!-- HEADER -->
+<header
+  class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-emerald-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+  <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-2.5 no-underline">
+      <div
+        class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-200">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="white" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
-      <div class="flex items-center gap-3 text-sm">
-        <a routerLink="/" class="text-slate-600 hover:text-slate-900 transition-colors dark:text-slate-300 dark:hover:text-white">Home</a>
-        <a href="#about" class="hidden sm:inline text-slate-600 hover:text-slate-900 transition-colors dark:text-slate-300 dark:hover:text-white">About</a>
-        <a href="#features" class="hidden sm:inline text-slate-600 hover:text-slate-900 transition-colors dark:text-slate-300 dark:hover:text-white">Features</a>
-        <a href="#location" class="hidden sm:inline text-slate-600 hover:text-slate-900 transition-colors dark:text-slate-300 dark:hover:text-white">Location</a>
-        <button
-          type="button"
-          class="rounded-full border border-slate-300 px-3 py-1.5 text-[11px] text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
-          (click)="toggleTheme()"
-        >
-          {{ themeMode === 'dark' ? 'Light mode' : 'Dark mode' }}
-        </button>
-        <a
-          *ngIf="!isLoggedIn()"
-          routerLink="/"
-          fragment="roles"
-          class="hidden sm:inline-flex items-center gap-1 rounded-full border border-sky-500/60 bg-sky-500/10 px-3 py-1.5 text-sky-700 text-xs font-medium hover:bg-sky-500/20 dark:text-sky-200"
-        >
-          Login
+      <span class="font-bold text-lg text-slate-900 dark:text-white tracking-tight">PropShield</span>
+    </a>
+
+    <!-- Nav Links (desktop) — only show when logged out -->
+    <nav *ngIf="!isLoggedIn()" class="hidden md:flex items-center gap-7">
+      <a href="#about"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">About</a>
+      <a href="#features"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Features</a>
+      <a href="#roles"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Roles</a>
+      <a href="#testimonials"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Testimonials</a>
+      <a href="#location"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact</a>
+    </nav>
+
+    <!-- Logged-in nav links -->
+    <nav *ngIf="isLoggedIn()" class="hidden md:flex items-center gap-7">
+      <a routerLink="/dashboard"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Dashboard</a>
+      <a routerLink="/policies"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Policies</a>
+      <a routerLink="/claims"
+        class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Claims</a>
+    </nav>
+
+    <!-- Right Side Actions -->
+    <div class="flex items-center gap-3">
+
+      <!-- Notifications -->
+      <app-notification-bell *ngIf="isLoggedIn()" />
+
+      <!-- Dark / Light Toggle -->
+      <button (click)="toggleTheme()" [title]="themeMode() === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        class="w-9 h-9 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-emerald-400 dark:hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all">
+        <!-- Sun — shown in dark mode -->
+        <svg *ngIf="themeMode() === 'dark'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+        <!-- Moon — shown in light mode -->
+        <svg *ngIf="themeMode() !== 'dark'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+
+      <!-- Login Button (logged out) -->
+      <a *ngIf="!isLoggedIn()" routerLink="/login"
+        class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-md shadow-emerald-200 dark:shadow-emerald-900/30 transition-all hover:-translate-y-0.5 active:scale-95">
+        Login
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M7 17L17 7M17 7H7M17 7v10" />
+        </svg>
+      </a>
+
+      <!-- Logout Button (logged in) -->
+      <button *ngIf="isLoggedIn()" (click)="logout()"
+        class="flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-red-300 dark:hover:border-red-500 hover:text-red-500 dark:hover:text-red-400 text-sm font-semibold px-5 py-2.5 rounded-full shadow-sm transition-all hover:-translate-y-0.5 active:scale-95">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+        </svg>
+        Logout
+      </button>
+
+      <!-- Mobile Hamburger -->
+      <button (click)="mobileMenuOpen.set(!mobileMenuOpen())"
+        class="md:hidden w-9 h-9 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-emerald-400 transition-all">
+        <svg *ngIf="!mobileMenuOpen()" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round">
+          <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+        <svg *ngIf="mobileMenuOpen()" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Dropdown -->
+  <div *ngIf="mobileMenuOpen()"
+    class="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-4 flex flex-col gap-1">
+
+    <!-- Logged-out links -->
+    <ng-container *ngIf="!isLoggedIn()">
+      <a href="#about" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">About</a>
+      <a href="#features" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Features</a>
+      <a href="#roles" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Roles</a>
+      <a href="#testimonials" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Testimonials</a>
+      <a href="#location" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Contact</a>
+      <div class="pt-3">
+        <a routerLink="/login" (click)="mobileMenuOpen.set(false)"
+          class="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-all active:scale-95">
+          Login to System
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 17L17 7M17 7H7M17 7v10" />
+          </svg>
         </a>
-        <button
-          *ngIf="isLoggedIn()"
-          type="button"
-          class="hidden sm:inline-flex items-center gap-1 rounded-full border border-rose-500/60 bg-rose-500/10 px-3 py-1.5 text-rose-700 text-xs font-medium hover:bg-rose-500/20 dark:text-rose-200"
-          (click)="logout()"
-        >
+      </div>
+    </ng-container>
+
+    <!-- Logged-in links -->
+    <ng-container *ngIf="isLoggedIn()">
+      <a routerLink="/dashboard" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Dashboard</a>
+      <a routerLink="/policies" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Policies</a>
+      <a routerLink="/claims" (click)="mobileMenuOpen.set(false)"
+        class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">Claims</a>
+      <div class="pt-3">
+        <button (click)="logout(); mobileMenuOpen.set(false)"
+          class="flex items-center justify-center gap-2 w-full border border-red-200 dark:border-red-900 text-red-500 dark:text-red-400 text-sm font-semibold px-5 py-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
           Logout
         </button>
       </div>
-    </nav>
-  </header>
-
-  <main class="flex-1">
-    <router-outlet />
-  </main>
-
-<footer class="bg-slate-100 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
-  <div class="max-w-6xl mx-auto px-4 py-12 grid gap-8 md:grid-cols-4">
-
-    <!-- Company Info -->
-    <div>
-      <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-50">
-        Property Insurance System
-      </h3>
-      <p class="mt-3 text-xs text-slate-600 dark:text-slate-300">
-        A secure platform for managing property insurance policies, premiums,
-        and claims with role-based workflow and transparent operations.
-      </p>
-    </div>
-
-    <!-- Quick Links -->
-    <div>
-      <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-50">
-        Quick Links
-      </h3>
-      <ul class="mt-3 space-y-2 text-xs text-slate-600 dark:text-slate-300">
-        <li><a href="#about" class="hover:text-emerald-500">About</a></li>
-        <li><a href="#features" class="hover:text-emerald-500">Features</a></li>
-        <li><a href="#roles" class="hover:text-emerald-500">Roles</a></li>
-        <li><a href="#location" class="hover:text-emerald-500">Contact</a></li>
-      </ul>
-    </div>
-
-    <!-- Services -->
-    <div>
-      <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-50">
-        Services
-      </h3>
-      <ul class="mt-3 space-y-2 text-xs text-slate-600 dark:text-slate-300">
-        <li>Policy Management</li>
-        <li>Premium Calculation</li>
-        <li>Claims Processing</li>
-        <li>Risk Assessment</li>
-      </ul>
-    </div>
-
-    <!-- Contact + Social -->
-    <div>
-      <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-50">
-        Contact Us
-      </h3>
-
-      <div class="mt-3 space-y-2 text-xs text-slate-600 dark:text-slate-300">
-        <p>📍 Hyderabad, India</p>
-        <p>📞 +91 98765 43210</p>
-        <p>✉ support@propertyinsurance.com</p>
-      </div>
-
-      <!-- Social Icons -->
-      <div class="mt-4 flex gap-4">
-
-        <!-- YouTube -->
-        <a href="#" class="text-slate-600 hover:text-red-600 dark:text-slate-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C15.8 5 12 5 12 5s-3.8 0-6.9.1c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 9.6 2 11.3v1.4C2 14.4 2.2 16 2.2 16s.2 1.4.8 2c.8.8 1.9.8 2.4.9 1.7.1 6.6.1 6.6.1s3.8 0 6.9-.1c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.3v-1.4C22 9.6 21.8 8 21.8 8zM9.8 15.3V8.7l6.3 3.3-6.3 3.3z"/>
-          </svg>
-        </a>
-
-        <!-- Instagram -->
-        <a href="#" class="text-slate-600 hover:text-pink-600 dark:text-slate-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm5 5.5A4.5 4.5 0 1112 16a4.5 4.5 0 010-9zm6-.8a1 1 0 110 2 1 1 0 010-2z"/>
-          </svg>
-        </a>
-
-        <!-- Twitter -->
-        <a href="#" class="text-slate-600 hover:text-blue-500 dark:text-slate-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M22 5.8c-.8.4-1.6.6-2.4.8.9-.5 1.5-1.3 1.8-2.3-.8.5-1.7.9-2.7 1.1A4.3 4.3 0 0016 4c-2.4 0-4.3 2-4.3 4.3 0 .3 0 .7.1 1C8 9.1 5.1 7.6 3.1 5.2c-.4.7-.6 1.4-.6 2.3 0 1.5.8 2.9 2 3.7-.7 0-1.4-.2-2-.5v.1c0 2.1 1.5 3.8 3.5 4.2-.4.1-.8.2-1.3.2-.3 0-.6 0-.8-.1.6 1.7 2.2 3 4.1 3A8.7 8.7 0 012 19.5 12.3 12.3 0 008.7 21c8 0 12.4-6.7 12.4-12.4v-.6c.8-.6 1.5-1.3 2-2.2z"/>
-          </svg>
-        </a>
-
-        <!-- Email -->
-        <a href="mailto:support@propertyinsurance.com" class="text-slate-600 hover:text-emerald-500 dark:text-slate-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M4 4h16v16H4z"/>
-            <path d="M22 6l-10 7L2 6"/>
-          </svg>
-        </a>
-
-      </div>
-    </div>
-
+    </ng-container>
   </div>
+</header>
 
-  <!-- Bottom Bar -->
-  <div class="border-t border-slate-200 dark:border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
-      <p>© 2026 Property Insurance Management System. All rights reserved.</p>
-      <div class="flex gap-4">
-        <a href="#" class="hover:text-emerald-500">Privacy Policy</a>
-        <a href="#" class="hover:text-emerald-500">Terms of Service</a>
+<!-- NOTIFICATIONS -->
+<app-notifications />
+
+<!-- PAGE CONTENT -->
+<main class="bg-white dark:bg-slate-950 transition-colors duration-300 min-h-screen">
+  <router-outlet />
+</main>
+
+<!-- FOOTER -->
+<footer
+  class="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 transition-colors duration-300">
+  <div class="max-w-6xl mx-auto px-6 pt-14 pb-8">
+
+    <!-- Top Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+
+      <!-- Brand -->
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="white" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <span class="font-bold text-lg text-slate-900 dark:text-white">PropShield</span>
+        </div>
+        <p class="text-sm text-slate-500 dark:text-slate-500 leading-relaxed max-w-xs">
+          Enterprise property insurance management platform built for modern efficiency and transparency.
+        </p>
+        <p class="mt-4 text-sm text-slate-400 dark:text-slate-600 italic">
+          "Insurance is the promise that tomorrow can still be better."
+        </p>
+        <div class="flex gap-6 mt-6">
+          <div>
+            <p class="text-emerald-600 dark:text-emerald-400 font-bold text-lg">25K+</p>
+            <p class="text-xs text-slate-400 dark:text-slate-600">Policies</p>
+          </div>
+          <div>
+            <p class="text-emerald-600 dark:text-emerald-400 font-bold text-lg">10K+</p>
+            <p class="text-xs text-slate-400 dark:text-slate-600">Customers</p>
+          </div>
+          <div>
+            <p class="text-emerald-600 dark:text-emerald-400 font-bold text-lg">99%</p>
+            <p class="text-xs text-slate-400 dark:text-slate-600">Satisfaction</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform Links -->
+      <div>
+        <h4 class="text-xs font-semibold text-slate-900 dark:text-slate-300 uppercase tracking-widest mb-4">Platform
+        </h4>
+        <ul class="space-y-3">
+          <li><a href="#features"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Features</a>
+          </li>
+          <li><a href="#roles"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Roles</a>
+          </li>
+          <li><a href="#about"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">About</a>
+          </li>
+          <li><a href="#testimonials"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Testimonials</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Support Links -->
+      <div>
+        <h4 class="text-xs font-semibold text-slate-900 dark:text-slate-300 uppercase tracking-widest mb-4">Support</h4>
+        <ul class="space-y-3">
+          <li><a href="#location"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact
+              Us</a>
+          </li>
+          <li><a href="#"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy
+              Policy</a></li>
+          <li><a href="#"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms
+              of
+              Service</a></li>
+          <li><a href="#"
+              class="text-sm text-slate-600 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Help
+              Center</a>
+          </li>
+        </ul>
       </div>
     </div>
+
+    <!-- Contact Bar -->
+    <div
+      class="border-t border-slate-200 dark:border-slate-800 pt-6 mb-6 flex flex-wrap gap-6 text-sm text-slate-500 dark:text-slate-600">
+      <span class="flex items-center gap-2"><span>📍</span> Financial District, Hyderabad, Telangana, India</span>
+      <span class="flex items-center gap-2"><span>📞</span> +91 98765 43210</span>
+      <span class="flex items-center gap-2"><span>✉️</span> support&#64;propertyinsurance.com</span>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div
+      class="border-t border-slate-200 dark:border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-xs text-slate-400 dark:text-slate-600">© 2025 PropShield Insurance Platform. All rights reserved.
+      </p>
+      <div class="flex items-center gap-3">
+        <!-- Theme toggle in footer -->
+        <button (click)="toggleTheme()"
+          class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-600 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">
+          <svg *ngIf="themeMode() === 'dark'" width="12" height="12" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2" />
+          </svg>
+          <svg *ngIf="themeMode() !== 'dark'" width="12" height="12" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          {{ themeMode() === 'dark' ? 'Dark Mode' : 'Light Mode' }}
+        </button>
+        <span class="text-slate-200 dark:text-slate-700">·</span>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs text-slate-500 dark:text-slate-600">System Operational</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </footer>
-  
-</div>
-
-<app-notifications />
