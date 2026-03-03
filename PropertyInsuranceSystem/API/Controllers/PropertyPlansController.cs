@@ -37,8 +37,10 @@ public class PropertyPlansController : ControllerBase
             PlanName = dto.PlanName,
             BaseCoverageAmount = dto.BaseCoverageAmount,
             CoverageRate = dto.CoverageRate,
+            BasePremium = dto.BasePremium,
+            AgentCommission = dto.AgentCommission,
+            Frequency = (Domain.Enums.PremiumFrequency)dto.Frequency,
             SubCategoryId = dto.SubCategoryId,
-          
         };
 
         _context.PropertyPlans.Add(plan);
@@ -50,6 +52,9 @@ public class PropertyPlansController : ControllerBase
             plan.PlanName,
             plan.BaseCoverageAmount,
             plan.CoverageRate,
+            plan.BasePremium,
+            plan.AgentCommission,
+            plan.Frequency,
             plan.SubCategoryId
         });
     }

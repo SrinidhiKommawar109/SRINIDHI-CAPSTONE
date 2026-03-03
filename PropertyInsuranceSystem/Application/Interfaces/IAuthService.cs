@@ -14,5 +14,6 @@ namespace Application.Interfaces
         Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
 
         Task CreateUserByAdminAsync(RegisterRequestDto request);
+        Task RedeemAsync(RedeemRequestDto request);
     }
 }

@@ -52,6 +52,19 @@ namespace API.Controllers
             };
 
             _context.Claims.Add(claim);
+            
+            var claimsOfficers = await _context.Users.Where(u => u.Role == UserRole.ClaimsOfficer).ToListAsync();
+            foreach (var co in claimsOfficers)
+            {
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = co.Id,
+                    Title = "New Claim Filed",
+                    Message = $"A new claim has been filed for policy ID {dto.PolicyRequestId}.",
+                    Type = "info"
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok("Claim request sent successfully.");
@@ -66,7 +79,26 @@ namespace API.Controllers
         {
             var claims = await _context.Claims
                 .Include(c => c.PolicyRequest)
+                    .ThenInclude(p => p.Plan)
+                .Include(c => c.PolicyRequest)
+                    .ThenInclude(p => p.Customer)
                 .Where(c => c.Status == ClaimStatus.Pending)
+                .ToListAsync();
+
+            return Ok(claims);
+        }
+
+        [HttpGet("history")]
+        [Authorize(Roles = "ClaimsOfficer")]
+        public async Task<IActionResult> GetClaimsHistory()
+        {
+            var claims = await _context.Claims
+                .Include(c => c.PolicyRequest)
+                    .ThenInclude(p => p.Plan)
+                .Include(c => c.PolicyRequest)
+                    .ThenInclude(p => p.Customer)
+                .Where(c => c.Status != ClaimStatus.Pending)
+                .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
             return Ok(claims);
@@ -107,6 +139,15 @@ namespace API.Controllers
                 };
 
                 _context.Invoices.Add(invoice);
+
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = policy.CustomerId,
+                    Title = "Claim Approved",
+                    Message = $"Your claim for {policy.Plan.PlanName} has been approved. Invoice {invoice.InvoiceNumber} generated.",
+                    Type = "success"
+                });
+
                 await _context.SaveChangesAsync();
                 claim.Remarks = dto.Remarks ?? "Claim accepted";
                 await _context.SaveChangesAsync();
@@ -116,6 +157,22 @@ namespace API.Controllers
             {
                 claim.Status = ClaimStatus.Rejected;
                 claim.Remarks = dto.Remarks ?? "Claim rejected";
+
+                var claimRequest = await _context.Claims
+                    .Include(c => c.PolicyRequest)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (claimRequest != null)
+                {
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = claimRequest.PolicyRequest.CustomerId,
+                        Title = "Claim Rejected",
+                        Message = $"Your claim for request ID {claimRequest.PolicyRequestId} has been rejected. Remarks: {claim.Remarks}",
+                        Type = "error"
+                    });
+                }
+
                 await _context.SaveChangesAsync();
                 return Ok("Claim rejected ❌");
             }

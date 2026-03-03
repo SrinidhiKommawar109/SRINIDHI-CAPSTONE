@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260228061427_AddInvoiceTable")]
-    partial class AddInvoiceTable
+    [Migration("20260303115854_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,16 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("ReferralBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ReferralCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReferralsCount")
+                        .HasColumnType("int");
+
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
@@ -66,6 +76,9 @@ namespace Infrastructure.Migrations
                             FullName = "Admin",
                             IsActive = true,
                             PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..",
+                            ReferralBalance = 0m,
+                            ReferralCode = "REF-1-ADMIN",
+                            ReferralsCount = 0,
                             Role = 1
                         },
                         new
@@ -75,6 +88,9 @@ namespace Infrastructure.Migrations
                             FullName = "Claims Officer",
                             IsActive = true,
                             PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..",
+                            ReferralBalance = 0m,
+                            ReferralCode = "REF-2-CLAIMS",
+                            ReferralsCount = 0,
                             Role = 4
                         },
                         new
@@ -84,6 +100,9 @@ namespace Infrastructure.Migrations
                             FullName = "Customer",
                             IsActive = true,
                             PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..",
+                            ReferralBalance = 0m,
+                            ReferralCode = "REF-3-CUSTOMER",
+                            ReferralsCount = 0,
                             Role = 3
                         });
                 });
@@ -195,6 +214,42 @@ namespace Infrastructure.Migrations
                     b.ToTable("Invoices");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("Domain.Entities.PolicyRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -202,6 +257,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminNotes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("AgentCommissionAmount")
                         .HasColumnType("decimal(18,2)");
@@ -259,6 +317,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
+                            AdminNotes = "Initial seed policy",
                             AgentCommissionAmount = 0m,
                             CustomerId = 3,
                             Frequency = 0,
@@ -272,6 +331,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 2,
+                            AdminNotes = "Commercial seed policy",
                             AgentCommissionAmount = 0m,
                             CustomerId = 3,
                             Frequency = 0,
@@ -348,46 +408,46 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            AgentCommission = 500m,
-                            BaseCoverageAmount = 1000000m,
-                            BasePremium = 5000m,
-                            CoverageRate = 0.02m,
+                            AgentCommission = 125m,
+                            BaseCoverageAmount = 250000m,
+                            BasePremium = 1250m,
+                            CoverageRate = 0.005m,
                             Frequency = 3,
-                            PlanName = "Basic Residential Plan",
+                            PlanName = "Standard Home Protection",
                             SubCategoryId = 1
                         },
                         new
                         {
                             Id = 2,
-                            AgentCommission = 1200m,
-                            BaseCoverageAmount = 5000000m,
-                            BasePremium = 15000m,
-                            CoverageRate = 0.03m,
+                            AgentCommission = 600m,
+                            BaseCoverageAmount = 1000000m,
+                            BasePremium = 8000m,
+                            CoverageRate = 0.008m,
                             Frequency = 1,
-                            PlanName = "Basic Commercial Plan",
+                            PlanName = "Business Liability Plus",
                             SubCategoryId = 2
                         },
                         new
                         {
                             Id = 3,
-                            AgentCommission = 2000m,
-                            BaseCoverageAmount = 10000000m,
-                            BasePremium = 25000m,
-                            CoverageRate = 0.04m,
+                            AgentCommission = 4500m,
+                            BaseCoverageAmount = 5000000m,
+                            BasePremium = 60000m,
+                            CoverageRate = 0.012m,
                             Frequency = 2,
-                            PlanName = "Basic Industrial Plan",
+                            PlanName = "Industrial Asset Guard",
                             SubCategoryId = 3
                         },
                         new
                         {
                             Id = 4,
-                            AgentCommission = 200m,
-                            BaseCoverageAmount = 300000m,
-                            BasePremium = 2000m,
-                            CoverageRate = 0.015m,
+                            AgentCommission = 400m,
+                            BaseCoverageAmount = 750000m,
+                            BasePremium = 4500m,
+                            CoverageRate = 0.006m,
                             Frequency = 3,
-                            PlanName = "Basic Contents Plan",
-                            SubCategoryId = 4
+                            PlanName = "Luxury Condo Shield",
+                            SubCategoryId = 1
                         });
                 });
 
@@ -503,6 +563,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("PolicyRequest");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.PolicyRequest", b =>

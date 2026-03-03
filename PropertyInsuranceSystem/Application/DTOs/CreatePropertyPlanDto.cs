@@ -14,5 +14,14 @@ public class CreatePropertyPlanDto
     public decimal CoverageRate { get; set; }
 
     [Required]
+    public decimal BasePremium { get; set; }
+
+    [Required]
+    public decimal AgentCommission { get; set; }
+
+    [Required]
+    public int Frequency { get; set; }
+
+    [Required]
     public int SubCategoryId { get; set; }
 }

@@ -17,6 +17,9 @@ namespace Domain.Entities
         public string PasswordHash { get; set; }
 
         public UserRole Role { get; set; }
+        public string ReferralCode { get; set; } = string.Empty;
+        public decimal ReferralBalance { get; set; } = 0;
+        public int ReferralsCount { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
     }

@@ -78,24 +78,70 @@ namespace API.Controllers
         // =====================================================
         [HttpPut("{id}/assign-agent/{agentId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignAgent(int id, int agentId)
+        public async Task<IActionResult> AssignAgent(int id, int agentId, [FromBody] string? adminNotes)
         {
             var request = await _context.PolicyRequests.FindAsync(id);
             if (request == null)
                 return NotFound("Request not found.");
-
+ 
             var agentExists = await _context.Users
-     .AnyAsync(u => u.Id == agentId && u.Role == UserRole.Agent);
-
+                .AnyAsync(u => u.Id == agentId && u.Role == UserRole.Agent);
+ 
             if (!agentExists)
                 return BadRequest("Invalid Agent ID.");
-
+ 
             request.AgentId = agentId;
+            request.AdminNotes = adminNotes;
             request.Status = PolicyRequestStatus.AgentAssigned;
+ 
+            // Notifications
+            _context.Notifications.Add(new Notification
+            {
+                UserId = agentId,
+                Title = "New Request Assigned",
+                Message = $"Admin assigned a new policy request (ID: {request.Id}) to you.",
+                Type = "info"
+            });
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = request.CustomerId,
+                Title = "Agent Assigned",
+                Message = $"An agent has been assigned to your policy request (ID: {request.Id}).",
+                Type = "success"
+            });
 
             await _context.SaveChangesAsync();
-
+ 
             return Ok("Agent assigned successfully.");
+        }
+ 
+        // =====================================================
+        // 3.1️⃣ AGENT - VIEW ASSIGNED REQUESTS
+        // =====================================================
+        [HttpGet("agent/assigned")]
+        [Authorize(Roles = "Agent")]
+        public async Task<IActionResult> GetAssignedRequests()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+            if (userIdClaim == null)
+                return Unauthorized("User ID not found in token.");
+ 
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+                return BadRequest("Invalid user ID in token.");
+ 
+            var requests = await _context.PolicyRequests
+                .Include(r => r.Plan)
+                .Include(r => r.Customer)
+                .Where(r => r.AgentId == userId && 
+                           (r.Status == PolicyRequestStatus.AgentAssigned || 
+                            r.Status == PolicyRequestStatus.FormSent || 
+                            r.Status == PolicyRequestStatus.FormSubmitted || 
+                            r.Status == PolicyRequestStatus.RiskCalculated))
+                .OrderByDescending(r => r.Id)
+                .ToListAsync();
+ 
+            return Ok(requests);
         }
 
         // =====================================================
@@ -114,6 +160,14 @@ namespace API.Controllers
 
             request.Status = PolicyRequestStatus.FormSent;
 
+            _context.Notifications.Add(new Notification
+            {
+                UserId = request.CustomerId,
+                Title = "Action Required: Property Details",
+                Message = "Please submit your property details as requested by the agent.",
+                Type = "info"
+            });
+ 
             await _context.SaveChangesAsync();
 
             return Ok("Form sent to customer.");
@@ -140,6 +194,17 @@ namespace API.Controllers
 
             request.Status = PolicyRequestStatus.FormSubmitted;
 
+            if (request.AgentId.HasValue)
+            {
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = request.AgentId.Value,
+                    Title = "Form Submitted",
+                    Message = $"Customer has submitted property details for request ID {request.Id}.",
+                    Type = "info"
+                });
+            }
+ 
             await _context.SaveChangesAsync();
 
             return Ok("Property details submitted successfully.");
@@ -201,8 +266,16 @@ namespace API.Controllers
 
             request.Status = PolicyRequestStatus.RiskCalculated;
 
+            _context.Notifications.Add(new Notification
+            {
+                UserId = request.CustomerId,
+                Title = "Premium Calculated",
+                Message = $"Your premium has been calculated: {request.TotalPremium:C}. Please review and confirm purchase.",
+                Type = "success"
+            });
+ 
             await _context.SaveChangesAsync();
-
+ 
             return Ok(new
             {
                 request.Id,
@@ -235,6 +308,18 @@ namespace API.Controllers
 
             request.Status = PolicyRequestStatus.CustomerConfirmed;
 
+            var admins = await _context.Users.Where(u => u.Role == UserRole.Admin).ToListAsync();
+            foreach (var admin in admins)
+            {
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = admin.Id,
+                    Title = "Action Required: Final Approval",
+                    Message = $"Customer has confirmed purchase for request ID {request.Id}. Please provide final approval.",
+                    Type = "info"
+                });
+            }
+ 
             await _context.SaveChangesAsync();
 
             return Ok("Customer confirmed. Waiting for admin approval.");
@@ -257,8 +342,16 @@ namespace API.Controllers
 
             request.Status = PolicyRequestStatus.PolicyApproved;
 
+            _context.Notifications.Add(new Notification
+            {
+                UserId = request.CustomerId,
+                Title = "Policy Approved",
+                Message = "Your policy has been officially approved. Congratulations!",
+                Type = "success"
+            });
+ 
             await _context.SaveChangesAsync();
-
+ 
             return Ok("Policy officially approved.");
         }
 

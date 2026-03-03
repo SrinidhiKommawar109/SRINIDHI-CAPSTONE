@@ -36,7 +36,10 @@ public class CategoryService : ICategoryService
                     Id = p.Id,
                     PlanName = p.PlanName,
                     BaseCoverageAmount = p.BaseCoverageAmount,
-                    CoverageRate = p.CoverageRate
+                    CoverageRate = p.CoverageRate,
+                    BasePremium = p.BasePremium,
+                    AgentCommission = p.AgentCommission,
+                    Frequency = (int)p.Frequency
                 }).ToList()
             }).ToList()
         }).ToList();
@@ -61,8 +64,10 @@ public class CategoryService : ICategoryService
             PlanName = dto.PlanName,
             BaseCoverageAmount = dto.BaseCoverageAmount,
             CoverageRate = dto.CoverageRate,
+            BasePremium = dto.BasePremium,
+            AgentCommission = dto.AgentCommission,
+            Frequency = (Domain.Enums.PremiumFrequency)dto.Frequency,
             SubCategoryId = dto.SubCategoryId,
-            
         };
 
         _context.PropertyPlans.Add(plan);

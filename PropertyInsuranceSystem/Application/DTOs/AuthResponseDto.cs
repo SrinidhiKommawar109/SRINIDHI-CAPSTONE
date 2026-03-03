@@ -13,7 +13,9 @@ namespace Application.DTOs
         public string RefreshToken { get; set; }
 
         public string Role { get; set; }
-
+        public string ReferralCode { get; set; }
+        public decimal ReferralBalance { get; set; }
+        public int ReferralsCount { get; set; }
         public DateTime Expiration { get; set; }
     }
 }

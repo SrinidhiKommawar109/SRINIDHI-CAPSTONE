@@ -37,4 +37,11 @@ public class AuthController : ControllerBase
         await _authService.CreateUserByAdminAsync(request);
         return Ok("User created successfully");
     }
+
+    [HttpPost("redeem")]
+    public async Task<IActionResult> Redeem(RedeemRequestDto request)
+    {
+        await _authService.RedeemAsync(request);
+        return Ok("Redeemed successfully");
+    }
 }

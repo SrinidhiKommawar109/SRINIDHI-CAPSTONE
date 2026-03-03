@@ -33,5 +33,6 @@ namespace Domain.Entities
 
         public int InstallmentCount { get; set; }
         public decimal AgentCommissionAmount { get; set; }
+        public string? AdminNotes { get; set; }
     }
 }
