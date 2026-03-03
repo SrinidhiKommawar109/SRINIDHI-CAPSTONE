@@ -27,12 +27,21 @@ export class AdminDashboardComponent implements OnInit {
   agentSelections: Record<number, number> = {};
   adminNotes: Record<number, string> = {};
 
-  activeView: 'managePlans' | 'assignAgents' | 'approvals' | 'analytics' = 'assignAgents';
+  activeView: 'managePlans' | 'assignAgents' | 'approvals' | 'analytics' | 'userManagement' = 'assignAgents';
 
   showAddPlanForm = false;
+  showAddUserForm = false;
   categories: any[] = [];
   filteredSubCategories: any[] = [];
   stats: any = null;
+  staff: any[] = [];
+
+  newUser = {
+    fullName: '',
+    email: '',
+    password: '',
+    role: 'Agent'
+  };
 
   newPlan = {
     planName: '',
@@ -50,6 +59,62 @@ export class AdminDashboardComponent implements OnInit {
     this.loadAgents();
     this.loadCategories();
     this.loadStats();
+    this.loadStaff();
+  }
+
+  loadStaff(): void {
+    this.adminService.getStaff().subscribe({
+      next: (res) => {
+        this.staff = res;
+        this.cdr.detectChanges();
+      },
+      error: () => this.cdr.detectChanges()
+    });
+  }
+
+  toggleAddUserForm(): void {
+    this.showAddUserForm = !this.showAddUserForm;
+    if (!this.showAddUserForm) {
+      this.resetUserForm();
+    }
+  }
+
+  resetUserForm(): void {
+    this.newUser = {
+      fullName: '',
+      email: '',
+      password: '',
+      role: 'Agent'
+    };
+  }
+
+  submitUser(): void {
+    if (!this.newUser.fullName || !this.newUser.email || !this.newUser.password) {
+      this.notifications.show({
+        title: 'Validation Error',
+        message: 'Please fill in all fields.',
+        type: 'error',
+      });
+      return;
+    }
+
+    this.adminService.createUser(this.newUser).subscribe({
+      next: () => {
+        this.notifications.show({
+          title: 'User Created',
+          message: `Successfully created ${this.newUser.role}: ${this.newUser.fullName}`,
+          type: 'success',
+        });
+        this.showAddUserForm = false;
+        this.resetUserForm();
+        this.loadStaff();
+        this.loadAgents(); // Refresh agent lists for assignment
+      },
+      error: (err) => {
+        this.pendingError = this.extractError(err);
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   loadStats(): void {
@@ -67,6 +132,7 @@ export class AdminDashboardComponent implements OnInit {
       case 'managePlans': return 'Plan Management';
       case 'assignAgents': return 'Agent Assignments';
       case 'approvals': return 'Policy Approvals';
+      case 'userManagement': return 'User Management';
       default: return 'Admin Dashboard';
     }
   }
@@ -76,6 +142,7 @@ export class AdminDashboardComponent implements OnInit {
       case 'managePlans': return 'Create and manage insurance plans across different categories.';
       case 'assignAgents': return 'Delegate policy requests to specialized insurance agents.';
       case 'approvals': return 'Review and finalize policies once customers provide confirmation.';
+      case 'userManagement': return 'Add and manage insurance agents and claims officers.';
       default: return 'Administrative control center.';
     }
   }

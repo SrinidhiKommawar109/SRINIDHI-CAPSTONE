@@ -31,5 +31,14 @@ export class AdminService {
   getStats(): Observable<any> {
     return this.http.get(`${this.baseUrl}/stats`);
   }
+
+  getStaff(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/staff`);
+  }
+
+  createUser(user: any): Observable<any> {
+    const url = `${environment.apiBaseUrl}/Auth/create-user`;
+    return this.http.post(url, user, { responseType: 'text' as 'json' });
+  }
 }
 

@@ -26,15 +26,8 @@ export class RegisterComponent implements OnInit {
         fullName: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
-        role: ['Customer', [Validators.required]],
         captchaAnswer: ['', [Validators.required]],
     });
-
-    roles: { key: UserRole; label: string }[] = [
-        { key: 'Customer', label: 'Customer' },
-        { key: 'Agent', label: 'Agent' },
-        { key: 'ClaimsOfficer', label: 'Claims Officer' },
-    ];
 
     captchaQuestion = '';
     private correctCaptchaAnswer = 0;
@@ -70,10 +63,10 @@ export class RegisterComponent implements OnInit {
         }
 
         this.loading = true;
-        const { fullName, email, password, role } = this.form.value;
+        const { fullName, email, password } = this.form.value;
 
         this.auth
-            .register({ fullName, email, password, role })
+            .register({ fullName, email, password, role: 'Customer' })
             .subscribe({
                 next: () => {
                     this.loading = false;
