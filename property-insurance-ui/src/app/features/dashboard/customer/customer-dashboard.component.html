@@ -1,6 +1,7 @@
 <div class="flex min-h-screen bg-slate-50 dark:bg-slate-950">
     <!-- Sidebar -->
-    <aside class="w-64 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 hidden md:block">
+    <aside
+        class="w-64 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 hidden md:flex flex-col">
         <div class="px-6 py-8">
             <nav class="space-y-1">
                 <a routerLink="browse" routerLinkActive="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
@@ -21,6 +22,16 @@
                         <polyline points="14 2 14 8 20 8" />
                     </svg>
                     My Requests
+                </a>
+                <a routerLink="rewards" routerLinkActive="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
+                    class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
+                    </svg>
+                    Rewards
                 </a>
                 <a routerLink="claims" routerLinkActive="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
                     class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100">
@@ -44,6 +55,33 @@
                     Invoices
                 </a>
             </nav>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="mt-auto border-t border-slate-100 p-6 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <div
+                    class="h-9 w-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs dark:bg-emerald-900/30 dark:text-emerald-400">
+                    {{ user.name?.[0]?.toUpperCase() || 'C' }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate dark:text-white">
+                        {{ user.name || 'Customer User' }}
+                    </p>
+                    <p class="text-[10px] text-slate-500 truncate dark:text-slate-400">
+                        {{ user.email || 'customer@propshield.com' }}
+                    </p>
+                    <p class="text-[10px] font-mono text-emerald-600 truncate dark:text-emerald-400 mt-0.5">
+                        {{ user.referralCode }}
+                    </p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <span
+                    class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                    {{ user.role }}
+                </span>
+            </div>
         </div>
     </aside>
 

@@ -1,253 +1,60 @@
-<section class="max-w-6xl mx-auto px-4 py-8 md:py-10">
-    <div class="flex items-center justify-between gap-4 mb-8">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-50">
-                Agent Workspace
-            </h1>
-            <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">
-                Manage your assigned policy requests and perform risk assessments.
-            </p>
-        </div>
-        <div class="flex items-center gap-4">
-            <button (click)="loadAssignedRequests()"
-                class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                    <path d="M3 3v5h5" />
-                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-                    <path d="M16 16h5v5" />
-                </svg>
-                Refresh
-            </button>
-        </div>
-    </div>
-
-    <div class="grid gap-6">
-        <!-- Assigned Requests Table -->
-        <div
-            class="rounded-2xl border border-slate-200 bg-white/90 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900/60">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Pending Actions</h2>
+<div class="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+    <!-- Sidebar -->
+    <aside
+        class="w-64 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 hidden md:flex flex-col">
+        <div class="px-6 py-8">
+            <div class="mb-8 px-3">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Agent Portal</span>
             </div>
-            <div class="p-0">
-                <div *ngIf="loading" class="p-12 text-center text-sm text-slate-500">Loading your assignments...</div>
-                <div *ngIf="!loading && assignedRequests.length === 0" class="p-16 text-center">
-                    <div
-                        class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3 dark:bg-slate-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                    </div>
-                    <p class="text-sm text-slate-500">No requests assigned to you yet.</p>
-                </div>
-
-                <div class="overflow-x-auto" *ngIf="assignedRequests.length > 0">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="bg-slate-50/50 dark:bg-slate-800/30">
-                                <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Request</th>
-                                <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Customer</th>
-                                <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Admin Notes</th>
-                                <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Status</th>
-                                <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100 text-right">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            <tr *ngFor="let req of assignedRequests"
-                                class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="font-bold text-slate-900 dark:text-slate-100">#{{ req.id }}</div>
-                                    <div class="text-[10px] text-slate-500 uppercase">{{ req.plan?.planName }}</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-slate-700 dark:text-slate-300">{{ req.customer?.fullName }}</div>
-                                    <div class="text-[10px] text-slate-500">{{ req.customer?.email }}</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-[10px] text-slate-500 italic max-w-xs truncate"
-                                        [title]="req.adminNotes">
-                                        {{ req.adminNotes || 'No notes provided' }}
-                                    </p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
-                                        [ngClass]="{
-                          'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': req.status === 'AgentAssigned',
-                          'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': req.status === 'FormSent',
-                          'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400': req.status === 'FormSubmitted',
-                          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': req.status === 'RiskCalculated'
-                        }">
-                                        {{ req.status }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button *ngIf="req.status !== 'PendingAdmin' && req.status !== 'AgentAssigned'"
-                                            (click)="viewDetails(req)"
-                                            class="rounded border border-slate-200 bg-white px-3 py-1 text-[10px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
-                                            View Details
-                                        </button>
-                                        <button *ngIf="req.status === 'AgentAssigned'" (click)="sendForm(req.id)"
-                                            class="rounded bg-sky-600 px-3 py-1 text-[10px] font-bold text-white hover:bg-sky-500">
-                                            Send Form
-                                        </button>
-                                        <button *ngIf="req.status === 'FormSubmitted'" (click)="calculateRisk(req.id)"
-                                            class="rounded bg-emerald-600 px-3 py-1 text-[10px] font-bold text-white hover:bg-emerald-500">
-                                            Calculate Risk
-                                        </button>
-                                        <span *ngIf="req.status === 'RiskCalculated'"
-                                            class="text-[10px] text-slate-400 font-medium">Awaiting Customer</span>
-                                        <span *ngIf="req.status === 'FormSent'"
-                                            class="text-[10px] text-slate-400 font-medium">Awaiting Submission</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <nav class="space-y-1">
+                <a routerLink="tasks" routerLinkActive="bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"
+                    class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                    My Requests
+                </a>
+                <a routerLink="earnings" routerLinkActive="bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400"
+                    class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white">
+                    ₹ Commission & Earnings
+                </a>
+            </nav>
         </div>
 
-        <!-- Property Details Overlay -->
-        <div *ngIf="selectedRequestDetails"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-            <div
-                class="w-full max-w-md scale-in-center rounded-2xl border border-slate-200 bg-white p-8 shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-in zoom-in-95 duration-300">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Property Details</h3>
-                        <p class="text-xs text-slate-500">Request #{{ selectedRequestDetails.id }} details</p>
-                    </div>
-                    <button (click)="closeDetails()"
-                        class="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
+        <!-- User Profile Section -->
+        <div class="mt-auto border-t border-slate-100 p-6 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+                <div
+                    class="h-9 w-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700 font-bold text-xs dark:bg-sky-900/30 dark:text-sky-400">
+                    {{ user.name?.[0]?.toUpperCase() || 'A' }}
                 </div>
-
-                <div class="space-y-6">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Property
-                            Address</label>
-                        <p class="text-sm font-medium text-slate-900 dark:text-slate-100 leading-relaxed">
-                            {{ selectedRequestDetails.propertyAddress || 'Not provided' }}
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-8">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Property
-                                Value</label>
-                            <p class="text-lg font-bold text-slate-900 dark:text-white">
-                                ₹{{ selectedRequestDetails.propertyValue | number:'1.0-0' }}
-                            </p>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Property
-                                Age</label>
-                            <p class="text-lg font-bold text-slate-900 dark:text-white">
-                                {{ selectedRequestDetails.propertyAge }} <span
-                                    class="text-xs font-normal text-slate-500 ml-0.5">years</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div *ngIf="selectedRequestDetails.riskScore !== undefined"
-                        class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Risk
-                                Assessment</label>
-                            <span
-                                class="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                                Calculated
-                            </span>
-                        </div>
-                        <div class="mt-2 flex items-center justify-between">
-                            <p class="text-sm text-slate-500">Calculated Risk Score</p>
-                            <p class="text-sm font-bold text-sky-600 dark:text-sky-400">{{
-                                selectedRequestDetails.riskScore }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8">
-                    <button (click)="closeDetails()"
-                        class="w-full rounded-xl bg-slate-900 py-3 text-sm font-bold text-white hover:bg-slate-800 transition-colors dark:bg-slate-50 dark:text-slate-950 dark:hover:bg-slate-200">
-                        Close Details
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Latest Calculation Result -->
-        <div *ngIf="lastRisk"
-            class="rounded-2xl border border-sky-200 bg-sky-50/50 p-6 dark:border-sky-900/50 dark:bg-sky-900/20 animate-in fade-in zoom-in duration-300">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-bold text-sky-900 dark:text-sky-300">Calculation Result - Request #{{
-                    lastRisk.id }}</h3>
-                <button (click)="lastRisk = null" class="text-sky-400 hover:text-sky-600">✕</button>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div>
-                    <p
-                        class="text-[10px] font-bold uppercase tracking-widest text-sky-600/60 dark:text-sky-400/60 mb-1">
-                        Risk Score</p>
-                    <p class="text-xl font-bold text-sky-950 dark:text-sky-100">{{ lastRisk.riskScore }}</p>
-                </div>
-                <div>
-                    <p
-                        class="text-[10px] font-bold uppercase tracking-widest text-sky-600/60 dark:text-sky-400/60 mb-1">
-                        Total Premium</p>
-                    <p class="text-xl font-bold text-sky-950 dark:text-sky-100">₹{{ lastRisk.totalPremium | number:
-                        '1.2-2' }}</p>
-                </div>
-                <div>
-                    <p
-                        class="text-[10px] font-bold uppercase tracking-widest text-sky-600/60 dark:text-sky-400/60 mb-1">
-                        Installments</p>
-                    <p class="text-sm font-bold text-sky-950 dark:text-sky-100">
-                        {{ lastRisk.installmentCount }} × ₹{{ lastRisk.installmentAmount | number: '1.2-2' }}
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate dark:text-white">
+                        {{ user.name || 'Agent User' }}
+                    </p>
+                    <p class="text-[10px] text-slate-500 truncate dark:text-slate-400">
+                        {{ user.email }}
+                    </p>
+                    <p class="text-[10px] font-mono text-sky-600 truncate dark:text-sky-400 mt-0.5">
+                        {{ user.referralCode }}
                     </p>
                 </div>
-                <div>
-                    <p
-                        class="text-[10px] font-bold uppercase tracking-widest text-sky-600/60 dark:text-sky-400/60 mb-1">
-                        Commission</p>
-                    <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">₹{{
-                        lastRisk.agentCommissionAmount | number: '1.2-2' }}</p>
-                </div>
+            </div>
+            <div class="mt-4">
+                <span
+                    class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                    {{ user.role }}
+                </span>
             </div>
         </div>
+    </aside>
 
-        <!-- Earnings Summary -->
-        <div
-            class="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Commission Summary</h3>
-                    <p class="text-[10px] text-slate-500 mt-1">Updates after final admin approval of policies.</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₹{{ totalCommission | number:
-                        '1.2-2' }}</p>
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Earned</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div *ngIf="errorMessage"
-        class="mt-6 rounded-xl border border-rose-500/60 bg-rose-500/10 p-4 text-xs text-rose-600 dark:text-rose-400">
-        {{ errorMessage }}
-    </div>
-</section>
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto">
+        <section class="max-w-6xl mx-auto px-6 py-8 md:py-12">
+            <router-outlet></router-outlet>
+        </section>
+    </main>
+</div>

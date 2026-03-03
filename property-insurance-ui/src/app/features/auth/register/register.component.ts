@@ -26,6 +26,7 @@ export class RegisterComponent implements OnInit {
         fullName: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
+        referralCode: [''],
         captchaAnswer: ['', [Validators.required]],
     });
 
@@ -63,10 +64,10 @@ export class RegisterComponent implements OnInit {
         }
 
         this.loading = true;
-        const { fullName, email, password } = this.form.value;
+        const { fullName, email, password, referralCode } = this.form.value;
 
         this.auth
-            .register({ fullName, email, password, role: 'Customer' })
+            .register({ fullName, email, password, role: 'Customer', referralCode })
             .subscribe({
                 next: () => {
                     this.loading = false;

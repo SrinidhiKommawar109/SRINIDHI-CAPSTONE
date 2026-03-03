@@ -16,6 +16,11 @@ import { CustomerBrowseComponent } from './features/dashboard/customer/customer-
 import { CustomerRequestsComponent } from './features/dashboard/customer/customer-requests/customer-requests.component';
 import { CustomerClaimsComponent } from './features/dashboard/customer/customer-claims/customer-claims.component';
 import { CustomerInvoicesComponent } from './features/dashboard/customer/customer-invoices/customer-invoices.component';
+import { CustomerRewardsComponent } from './features/dashboard/customer/customer-rewards/customer-rewards.component';
+import { AgentTasksComponent } from './features/dashboard/agent/agent-tasks/agent-tasks.component';
+import { AgentEarningsComponent } from './features/dashboard/agent/agent-earnings/agent-earnings.component';
+import { ClaimsPendingComponent } from './features/dashboard/claims/claims-pending/claims-pending.component';
+import { ClaimsHistoryComponent } from './features/dashboard/claims/claims-history/claims-history.component';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -41,6 +46,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['Agent'] },
     component: AgentDashboardComponent,
+    children: [
+      { path: '', redirectTo: 'tasks', pathMatch: 'full' },
+      { path: 'tasks', component: AgentTasksComponent },
+      { path: 'earnings', component: AgentEarningsComponent },
+    ],
   },
   {
     path: 'customer',
@@ -51,6 +61,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'browse', pathMatch: 'full' },
       { path: 'browse', component: CustomerBrowseComponent },
       { path: 'requests', component: CustomerRequestsComponent },
+      { path: 'rewards', component: CustomerRewardsComponent },
       { path: 'claims', component: CustomerClaimsComponent },
       { path: 'invoices', component: CustomerInvoicesComponent },
     ],
@@ -60,6 +71,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['ClaimsOfficer'] },
     component: ClaimsDashboardComponent,
+    children: [
+      { path: '', redirectTo: 'pending', pathMatch: 'full' },
+      { path: 'pending', component: ClaimsPendingComponent },
+      { path: 'history', component: ClaimsHistoryComponent },
+    ],
   },
   { path: '**', component: NotFoundComponent },
 ];

@@ -1,0 +1,64 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div class="flex items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-50">
+                Processed History
+            </h1>
+            <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">
+                View all previously processed, approved, and rejected claims.
+            </p>
+        </div>
+        <button (click)="loadHistory()"
+            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+            Refresh
+        </button>
+    </div>
+
+    <!-- History List -->
+    <div class="space-y-4">
+        <div *ngIf="loading" class="p-12 text-center text-sm text-slate-500 italic">Retrieving records...</div>
+        <div *ngIf="!loading && claimsHistory.length === 0"
+            class="p-20 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl">
+            <p class="text-sm text-slate-400">No claim history found yet.</p>
+        </div>
+
+        <div *ngFor="let claim of claimsHistory"
+            class="group rounded-2xl border border-slate-200 bg-white p-5 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/40 dark:hover:bg-slate-900">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div [class]="claim.status === 'Approved' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'"
+                        class="h-12 w-12 rounded-2xl flex items-center justify-center font-bold text-sm">
+                        {{ claim.status.substring(0,1) }}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <p class="font-bold text-slate-900 dark:text-slate-50">Claim #{{ claim.id }}</p>
+                            <span
+                                [class]="claim.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-500' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-500'"
+                                class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                {{ claim.status }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">{{ claim.policyRequest?.plan?.planName }} • {{
+                            claim.policyRequest?.customer?.fullName }}</p>
+                    </div>
+                </div>
+                <div
+                    class="flex items-center justify-between md:text-right border-t md:border-t-0 pt-3 md:pt-0 border-slate-50 dark:border-slate-800">
+                    <div class="md:hidden text-[10px] text-slate-400 font-bold uppercase tracking-widest">Final Amount
+                    </div>
+                    <p class="text-lg font-bold text-slate-900 dark:text-slate-50">₹{{ claim.claimAmount | number:
+                        '1.2-2' }}</p>
+                </div>
+            </div>
+
+            <!-- Remarks from History -->
+            <div *ngIf="claim.remarks"
+                class="mt-4 p-3 rounded-xl bg-slate-50/50 border border-slate-100 text-xs text-slate-600 dark:bg-slate-800/30 dark:border-slate-700/50 dark:text-slate-400 italic">
+                <span class="font-bold uppercase tracking-widest text-[9px] text-slate-400 mr-2 not-italic">Decision
+                    Remarks:</span>
+                "{{ claim.remarks }}"
+            </div>
+        </div>
+    </div>
+</div>

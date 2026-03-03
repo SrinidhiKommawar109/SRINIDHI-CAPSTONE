@@ -1,0 +1,100 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-slate-50">
+                Pending Claims Review
+            </h1>
+            <p class="text-xs md:text-sm text-slate-500 mt-1 dark:text-slate-400">
+                Verify eligibility, check documentation, and process payouts for pending claims.
+            </p>
+        </div>
+        <button type="button"
+            class="rounded-full border border-slate-300 px-4 py-1.5 text-xs font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900 transition-colors"
+            (click)="loadPending()">
+            Refresh List
+        </button>
+    </div>
+
+    <div *ngIf="loading" class="py-12 text-center text-xs text-slate-500 dark:text-slate-400 italic">
+        Loading pending claims…
+    </div>
+    <div *ngIf="errorMessage"
+        class="mb-6 rounded-lg bg-rose-50 p-4 text-xs text-rose-600 dark:bg-rose-950/20 dark:text-rose-400">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && pendingClaims.length === 0" class="py-20 text-center">
+        <div
+            class="mx-auto w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4 dark:bg-slate-800">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                <polyline points="14 2 14 8 20 8" />
+            </svg>
+        </div>
+        <p class="text-sm text-slate-500 dark:text-slate-400">No pending claims found.</p>
+    </div>
+
+    <div *ngIf="!loading && pendingClaims.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        <div *ngFor="let claim of pendingClaims"
+            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 transition-all hover:shadow-md">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <span
+                        class="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 uppercase tracking-tight mb-2">
+                        Claim #{{ claim.id }}
+                    </span>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        {{ claim.policyRequest?.plan?.planName || 'Standard Policy' }}
+                    </h3>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-emerald-600">₹{{ claim.claimAmount | number: '1.2-2' }}</p>
+                    <p class="text-[10px] text-slate-400">Requested Amount</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/50">
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Customer</p>
+                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{
+                        claim.policyRequest?.customer?.fullName || 'N/A' }}</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Property Age</p>
+                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ claim.propertyAge }} Years</p>
+                </div>
+            </div>
+
+            <div class="py-4 space-y-1">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Event Location</p>
+                <p class="text-xs text-slate-600 dark:text-slate-400 italic leading-relaxed">
+                    {{ claim.propertyAddress }}
+                </p>
+            </div>
+
+            <div class="pt-4 space-y-3">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">Assessment
+                        Remarks</label>
+                    <input type="text"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                        [(ngModel)]="claimRemarks[claim.id]" placeholder="Internal notes..." />
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button type="button"
+                        class="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-colors shadow-sm shadow-emerald-200 dark:shadow-none"
+                        (click)="verifyClaim(claim.id, true)">
+                        Approve
+                    </button>
+                    <button type="button"
+                        class="flex-1 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-500 transition-colors shadow-sm shadow-rose-200 dark:shadow-none"
+                        (click)="verifyClaim(claim.id, false)">
+                        Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
