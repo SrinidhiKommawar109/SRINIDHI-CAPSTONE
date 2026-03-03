@@ -33,6 +33,9 @@ export class App {
   }
 
   logout(): void {
-    this.authService.logout();
+    const confirmLogout = window.confirm('Do you really want to exit from this page?');
+    if (confirmLogout) {
+      this.authService.logout();
+    }
   }
 }

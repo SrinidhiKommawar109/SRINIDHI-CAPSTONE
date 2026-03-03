@@ -1,12 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   PolicyRequestsService,
   PolicyRequest,
-} from '../../core/policy-requests.service';
-import { AdminService, AgentSummary } from '../../core/admin.service';
-import { NotificationsService } from '../../core/notifications.service';
+} from '../../../core/policy-requests.service';
+import { AdminService, AgentSummary } from '../../../core/admin.service';
+import { NotificationsService } from '../../../core/notifications.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -18,6 +18,7 @@ export class AdminDashboardComponent implements OnInit {
   private readonly policyRequests = inject(PolicyRequestsService);
   private readonly adminService = inject(AdminService);
   private readonly notifications = inject(NotificationsService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   pendingRequests: PolicyRequest[] = [];
   pendingLoading = false;
@@ -55,7 +56,9 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.getStats().subscribe({
       next: (res) => {
         this.stats = res;
+        this.cdr.detectChanges();
       },
+      error: () => this.cdr.detectChanges()
     });
   }
 
@@ -105,7 +108,9 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.getCategories().subscribe({
       next: (cats) => {
         this.categories = cats;
+        this.cdr.detectChanges();
       },
+      error: () => this.cdr.detectChanges()
     });
   }
 
@@ -155,9 +160,11 @@ export class AdminDashboardComponent implements OnInit {
         });
         this.showAddPlanForm = false;
         this.resetPlanForm();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.pendingError = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -166,7 +173,9 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.getAgents().subscribe({
       next: (agents) => {
         this.agents = agents;
+        this.cdr.detectChanges();
       },
+      error: () => this.cdr.detectChanges()
     });
   }
 
@@ -177,10 +186,12 @@ export class AdminDashboardComponent implements OnInit {
       next: (requests) => {
         this.pendingRequests = requests;
         this.pendingLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.pendingError = this.extractError(err);
         this.pendingLoading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -204,6 +215,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.pendingError = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -220,6 +232,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.pendingError = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }

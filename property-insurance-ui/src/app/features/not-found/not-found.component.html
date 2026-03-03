@@ -1,0 +1,58 @@
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-white dark:bg-slate-950 px-6 py-12">
+    <div class="max-w-xl w-full text-center">
+
+        <!-- 404 Illustration placeholder/Icon -->
+        <div class="relative inline-block mb-10">
+            <div class="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full scale-150"></div>
+            <h1 class="relative text-9xl font-black text-slate-900/10 dark:text-white/5 select-none tracking-tighter">
+                404</h1>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div
+                    class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-xl shadow-emerald-200 dark:shadow-emerald-900/30">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Oops! Page Not Found</h2>
+        <p class="text-slate-500 dark:text-slate-400 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+            The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+        </p>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a routerLink="/"
+                class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 dark:shadow-none transition-all hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+                Back to Home
+            </a>
+            <button onclick="history.back()"
+                class="w-full sm:w-auto px-8 py-3.5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 active:scale-95">
+                Go Back
+            </button>
+        </div>
+
+        <!-- Suggested Links -->
+        <div class="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
+            <p class="text-sm font-semibold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4">Quick
+                Links</p>
+            <div class="flex flex-wrap justify-center gap-x-8 gap-y-3 font-medium text-slate-600 dark:text-slate-400">
+                <a routerLink="/login"
+                    class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Login</a>
+                <a routerLink="/register"
+                    class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Register</a>
+                <a routerLink="/dashboard"
+                    class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>

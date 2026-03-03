@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -6,10 +6,10 @@ import {
   PolicyRequest,
   PropertyPlan,
   SubmitPropertyPayload,
-} from '../../core/policy-requests.service';
-import { ClaimsService, CreateClaimPayload } from '../../core/claims.service';
-import { InvoicesService, Invoice } from '../../core/invoices.service';
-import { NotificationsService } from '../../core/notifications.service';
+} from '../../../core/policy-requests.service';
+import { ClaimsService, CreateClaimPayload } from '../../../core/claims.service';
+import { InvoicesService, Invoice } from '../../../core/invoices.service';
+import { NotificationsService } from '../../../core/notifications.service';
 
 @Component({
   selector: 'app-customer-dashboard',
@@ -22,6 +22,7 @@ export class CustomerDashboardComponent implements OnInit {
   private readonly claims = inject(ClaimsService);
   private readonly invoicesService = inject(InvoicesService);
   private readonly notifications = inject(NotificationsService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   plans: PropertyPlan[] = [];
   createMessage = '';
@@ -108,7 +109,9 @@ export class CustomerDashboardComponent implements OnInit {
     this.policies.getAllPlans().subscribe({
       next: (plans) => {
         this.plans = plans;
+        this.cdr.detectChanges();
       },
+      error: () => this.cdr.detectChanges()
     });
   }
 
@@ -129,6 +132,7 @@ export class CustomerDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.createMessage = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -139,9 +143,11 @@ export class CustomerDashboardComponent implements OnInit {
       next: (requests) => {
         this.myRequests = requests;
         this.requestsLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.requestsLoading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -165,6 +171,7 @@ export class CustomerDashboardComponent implements OnInit {
         },
         error: (err) => {
           this.submitMessage = this.extractError(err);
+          this.cdr.detectChanges();
         },
       });
   }
@@ -186,6 +193,7 @@ export class CustomerDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.buyMessage = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -207,6 +215,7 @@ export class CustomerDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.claimMessage = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -217,9 +226,11 @@ export class CustomerDashboardComponent implements OnInit {
       next: (invoices) => {
         this.invoices = invoices;
         this.invoicesLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.invoicesLoading = false;
+        this.cdr.detectChanges();
       },
     });
   }

@@ -6,6 +6,18 @@ import { environment } from '../../environments/environment';
 export interface Claim {
   id: number;
   policyRequestId: number;
+  policyRequest?: {
+    plan?: {
+      planName: string;
+    };
+    customer?: {
+      fullName: string;
+      email: string;
+    };
+  };
+  propertyAddress: string;
+  propertyValue: number;
+  propertyAge: number;
   claimAmount: number;
   status: string;
   remarks?: string;
@@ -32,6 +44,10 @@ export class ClaimsService {
 
   getPendingClaims(): Observable<Claim[]> {
     return this.http.get<Claim[]>(this.baseUrl + '/pending');
+  }
+
+  getClaimsHistory(): Observable<Claim[]> {
+    return this.http.get<Claim[]>(this.baseUrl + '/history');
   }
 
   createClaim(payload: CreateClaimPayload): Observable<string> {

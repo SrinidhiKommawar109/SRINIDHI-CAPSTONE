@@ -1,11 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   PolicyRequestsService,
   CalculateRiskResponse,
   PolicyRequest,
-} from '../../core/policy-requests.service';
-import { NotificationsService } from '../../core/notifications.service';
+} from '../../../core/policy-requests.service';
+import { NotificationsService } from '../../../core/notifications.service';
 @Component({
   selector: 'app-agent-dashboard',
   standalone: true,
@@ -15,10 +15,12 @@ import { NotificationsService } from '../../core/notifications.service';
 export class AgentDashboardComponent implements OnInit {
   private readonly policies = inject(PolicyRequestsService);
   private readonly notifications = inject(NotificationsService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   assignedRequests: PolicyRequest[] = [];
   loading = false;
   lastRisk: CalculateRiskResponse | null = null;
+  selectedRequestDetails: PolicyRequest | null = null;
   errorMessage = '';
   totalCommission = 0;
 
@@ -33,10 +35,12 @@ export class AgentDashboardComponent implements OnInit {
       next: (requests) => {
         this.assignedRequests = requests;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = this.extractError(err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -48,9 +52,11 @@ export class AgentDashboardComponent implements OnInit {
           (sum, req) => sum + (req.agentCommissionAmount || 0),
           0,
         );
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -67,9 +73,11 @@ export class AgentDashboardComponent implements OnInit {
           message: `Request #${requestId} sent to customer.`,
           type: 'success',
         });
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -87,11 +95,21 @@ export class AgentDashboardComponent implements OnInit {
           message: 'Premium and commission calculated.',
           type: 'success',
         });
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = this.extractError(err);
+        this.cdr.detectChanges();
       },
     });
+  }
+
+  viewDetails(req: PolicyRequest): void {
+    this.selectedRequestDetails = req;
+  }
+
+  closeDetails(): void {
+    this.selectedRequestDetails = null;
   }
 
   private extractError(err: any): string {

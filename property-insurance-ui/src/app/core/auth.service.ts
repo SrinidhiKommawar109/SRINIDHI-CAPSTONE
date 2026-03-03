@@ -18,6 +18,13 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -40,6 +47,11 @@ export class AuthService {
         this.authStateSubject.next(true);
       }),
     );
+  }
+
+  register(request: RegisterRequest): Observable<any> {
+    const url = `${environment.apiBaseUrl}/Auth/register`;
+    return this.http.post(url, request);
   }
 
   logout(): void {

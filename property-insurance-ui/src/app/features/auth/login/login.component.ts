@@ -7,7 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AuthService, UserRole } from '../../core/auth.service';
+import { AuthService, UserRole } from '../../../core/auth.service';
 
 type UiRole = UserRole;
 
@@ -99,15 +99,9 @@ export class LoginComponent implements OnInit {
 
           this.redirectByRole(backendRole as UiRole);
         },
-        error: (err) => {
+        error: () => {
           this.loading = false;
-          if (err?.error && typeof err.error === 'string') {
-            this.errorMessage = err.error;
-          } else if (err?.error?.title) {
-            this.errorMessage = err.error.title;
-          } else {
-            this.errorMessage = 'Login failed. Please check your credentials.';
-          }
+          this.router.navigate(['/not-found']);
         },
       });
   }

@@ -1,20 +1,23 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ClaimsService, Claim } from '../../core/claims.service';
-import { NotificationsService } from '../../core/notifications.service';
+import { ClaimsService, Claim } from '../../../core/claims.service';
+import { NotificationsService } from '../../../core/notifications.service';
 
 @Component({
-  selector: 'app-claims-officer-dashboard',
+  selector: 'app-claims-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: 'claims-dashboard.component.html'
 })
-export class ClaimsOfficerDashboardComponent implements OnInit {
+export class ClaimsDashboardComponent implements OnInit {
   private readonly claims = inject(ClaimsService);
   private readonly notifications = inject(NotificationsService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   pendingClaims: Claim[] = [];
+  claimsHistory: Claim[] = [];
+  activeTab: 'pending' | 'history' = 'pending';
   claimRemarks: Record<number, string> = {};
   loading = false;
   errorMessage = '';
@@ -30,12 +33,40 @@ export class ClaimsOfficerDashboardComponent implements OnInit {
       next: (claims) => {
         this.pendingClaims = claims;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = this.extractError(err);
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
+  }
+
+  loadHistory(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.claims.getClaimsHistory().subscribe({
+      next: (claims) => {
+        this.claimsHistory = claims;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMessage = this.extractError(err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  switchTab(tab: 'pending' | 'history'): void {
+    this.activeTab = tab;
+    if (tab === 'pending') {
+      this.loadPending();
+    } else {
+      this.loadHistory();
+    }
   }
 
   verifyClaim(id: number, accepted: boolean): void {
@@ -55,6 +86,7 @@ export class ClaimsOfficerDashboardComponent implements OnInit {
         },
         error: (err) => {
           this.errorMessage = this.extractError(err);
+          this.cdr.detectChanges();
         },
       });
   }
@@ -65,6 +97,9 @@ export class ClaimsOfficerDashboardComponent implements OnInit {
     }
     if (err?.error?.title) {
       return err.error.title;
+    }
+    if (err?.status) {
+      return `Error ${err.status}: ${err.statusText || 'Terminal failure'}`;
     }
     return 'Something went wrong while processing the request.';
   }
