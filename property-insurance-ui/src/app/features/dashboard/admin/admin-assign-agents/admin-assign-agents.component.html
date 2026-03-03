@@ -1,0 +1,52 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Pending Agent Assignments</h2>
+        <button type="button"
+            class="rounded-full border border-slate-300 px-3 py-1 text-[11px] hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900"
+            (click)="loadData()">Refresh</button>
+    </div>
+
+    <div *ngIf="loading" class="text-xs text-slate-500 mb-3">Loading pending requests…</div>
+    <div *ngIf="error" class="text-xs text-rose-600 mb-3">{{ error }}</div>
+    <div *ngIf="!loading && getPendingAssignmentRequests().length === 0"
+        class="text-center py-12 bg-white rounded-xl border border-dashed border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+        <p class="text-xs text-slate-500">No requests waiting for agent assignment.</p>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+        <div *ngFor="let req of getPendingAssignmentRequests()"
+            class="rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700 space-y-3 dark:border-slate-800 dark:bg-slate-900">
+            <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-900 dark:text-white">Request #{{ req.id }}</span>
+                <span
+                    class="rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                    {{ req.status }}
+                </span>
+            </div>
+            <div class="space-y-1">
+                <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Plan:</span>
+                    {{ req.plan?.planName || ('Plan ' + req.planId) }}</p>
+                <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Customer:</span>
+                    #{{ req.customerId }}</p>
+            </div>
+            <div class="pt-2">
+                <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">Notes for
+                    Agent</label>
+                <textarea [(ngModel)]="adminNotes[req.id]"
+                    class="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-[10px] text-slate-700 focus:ring-1 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                    rows="2" placeholder="Provide specific instructions..."></textarea>
+            </div>
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <select
+                    class="flex-1 rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-700 focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
+                    [(ngModel)]="agentSelections[req.id]">
+                    <option [ngValue]="0">Select agent</option>
+                    <option *ngFor="let agent of agents" [ngValue]="agent.id">{{ agent.fullName }}</option>
+                </select>
+                <button type="button"
+                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 transition-all"
+                    (click)="assignAgent(req.id)">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>

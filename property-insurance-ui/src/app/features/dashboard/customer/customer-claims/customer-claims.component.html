@@ -1,0 +1,48 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div
+        class="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 p-8 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+        <h2 class="text-base font-semibold text-slate-900 mb-6 dark:text-slate-100 text-center">Submit a New Claim</h2>
+        <div class="space-y-5">
+            <div>
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Active Policy
+                    ID</label>
+                <input type="number" min="1"
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                    placeholder="e.g. 505" [(ngModel)]="claimPayload.policyRequestId" />
+            </div>
+            <div>
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Property
+                    Address</label>
+                <input type="text"
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                    placeholder="Where did incident occur?" [(ngModel)]="claimPayload.propertyAddress" />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Impacted
+                        Value</label>
+                    <input type="number"
+                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        placeholder="₹" [(ngModel)]="claimPayload.propertyValue" />
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Property
+                        Age</label>
+                    <input type="number"
+                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        placeholder="Years" [(ngModel)]="claimPayload.propertyAge" />
+                </div>
+            </div>
+            <div class="pt-4">
+                <button (click)="fileClaim()"
+                    class="w-full rounded-xl bg-rose-600 px-6 py-4 text-sm font-bold text-white shadow-lg shadow-rose-500/20 hover:bg-rose-500 hover:-translate-y-0.5 transition-all active:translate-y-0">
+                    File Claim Report
+                </button>
+            </div>
+            <div *ngIf="claimMessage"
+                class="text-center text-xs font-medium text-emerald-600 mt-4 dark:text-emerald-400">
+                {{ claimMessage }}
+            </div>
+        </div>
+    </div>
+</div>

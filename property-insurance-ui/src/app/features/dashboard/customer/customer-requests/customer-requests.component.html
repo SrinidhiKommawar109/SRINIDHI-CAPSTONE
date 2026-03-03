@@ -1,0 +1,172 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+    <!-- Requests List -->
+    <div
+        class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-800">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">My Policy Requests</h2>
+            <button type="button"
+                class="text-xs font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1 dark:text-slate-400 dark:hover:text-slate-100"
+                (click)="loadMyRequests()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                    <path d="M16 16h5v5" />
+                </svg>
+                Refresh
+            </button>
+        </div>
+        <div class="p-0">
+            <div *ngIf="requestsLoading" class="p-6 text-center text-sm text-slate-500">Loading requests...</div>
+            <div *ngIf="!requestsLoading && myRequests.length === 0" class="p-12 text-center">
+                <div
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3 dark:bg-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                </div>
+                <p class="text-sm text-slate-500">No requests found.</p>
+            </div>
+            <div class="overflow-x-auto" *ngIf="myRequests.length > 0">
+                <table class="w-full text-left text-sm">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tr *ngFor="let req of myRequests"
+                            class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">#{{ req.id }}</td>
+                            <td class="px-6 py-4">
+                                <div class="text-slate-700 dark:text-slate-300">{{ req.plan?.planName || ('Plan ' +
+                                    req.planId) }}</div>
+                                <div *ngIf="req.totalPremium" class="text-[10px] text-emerald-600 font-semibold">
+                                    ₹{{ req.totalPremium | number: '1.2-2' }} (Calculated)
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-xs">
+                                <div *ngIf="req.installmentAmount" class="text-slate-600 dark:text-slate-400">
+                                    {{ req.installmentCount }} × ₹{{ req.installmentAmount | number: '1.2-2' }}
+                                </div>
+                                <div *ngIf="!req.installmentAmount" class="text-slate-400 italic">Pending...</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                    [ngClass]="{
+                                        'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': req.status === 'PendingAdmin',
+                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': req.status === 'AgentAssigned',
+                                        'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400': req.status === 'RiskCalculated',
+                                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': req.status === 'PolicyApproved'
+                                    }">
+                                    {{ req.status }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit + Buy Grid -->
+    <div class="grid gap-8 md:grid-cols-2">
+        <!-- Submit Details -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <h3 class="text-sm font-semibold text-slate-900 mb-4 dark:text-slate-100">Submit Property Details</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Policy
+                        Request ID</label>
+                    <input type="number" min="1"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        placeholder="e.g. 101" [(ngModel)]="submitRequestId" />
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Property
+                        Address</label>
+                    <input type="text"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        placeholder="Full address" [(ngModel)]="submitPayload.propertyAddress" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Property
+                            Value</label>
+                        <input type="number"
+                            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                            placeholder="₹" [(ngModel)]="submitPayload.propertyValue" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Age
+                            (Years)</label>
+                        <input type="number"
+                            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                            placeholder="Years" [(ngModel)]="submitPayload.propertyAge" />
+                    </div>
+                </div>
+                <button (click)="submitProperty()"
+                    class="w-full rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 transition-all">
+                    Submit Property Info
+                </button>
+                <div *ngIf="submitMessage" class="text-xs text-emerald-600 dark:text-emerald-400">{{ submitMessage }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Finalize Purchase -->
+        <div
+            class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm dark:bg-slate-900 dark:border-slate-800 relative">
+            <h3 class="text-sm font-semibold text-slate-900 mb-4 dark:text-slate-100">Finalize Purchase</h3>
+            <p class="text-xs text-slate-500 mb-6 dark:text-slate-400">Once your request is approved, confirm to
+                activate your policy.</p>
+
+            <div *ngIf="!showPaymentForm" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Approved
+                        Request ID</label>
+                    <input type="number" min="1"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        placeholder="e.g. 101" [(ngModel)]="buyRequestId" />
+                </div>
+                <button (click)="initiateCheckout()"
+                    class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-all">
+                    Proceed to Payment
+                </button>
+                <div *ngIf="buyMessage" class="text-xs text-emerald-600 dark:text-emerald-400">{{ buyMessage }}</div>
+            </div>
+
+            <!-- Dummy Payment Overlay -->
+            <div *ngIf="showPaymentForm"
+                class="absolute inset-0 z-10 bg-white/95 backdrop-blur-sm p-6 rounded-2xl dark:bg-slate-900/95 animate-in fade-in duration-300">
+                <h4 class="text-xs font-bold uppercase text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="14" x="2" y="5" rx="2" />
+                        <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
+                    Secure Checkout
+                </h4>
+                <div class="space-y-3">
+                    <input type="text"
+                        class="w-full rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800 dark:border-slate-700"
+                        placeholder="Card Number (XXXX-XXXX-XXXX-XXXX)" />
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text"
+                            class="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800 dark:border-slate-700"
+                            placeholder="MM/YY" />
+                        <input type="text"
+                            class="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800 dark:border-slate-700"
+                            placeholder="CVV" />
+                    </div>
+                    <div class="pt-2 flex gap-2">
+                        <button (click)="showPaymentForm = false"
+                            class="flex-1 rounded border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400">Cancel</button>
+                        <button (click)="confirmPurchase()"
+                            class="flex-1 rounded bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 dark:bg-slate-50 dark:text-slate-950">Pay
+                            Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
