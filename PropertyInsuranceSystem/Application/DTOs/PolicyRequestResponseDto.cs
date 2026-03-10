@@ -20,4 +20,9 @@ public class PolicyRequestResponseDto
     
     // Visibility controlled in mapping
     public decimal? AgentCommissionAmount { get; set; }
+
+    public int? ClaimsOfficerId { get; set; }
+    public string? ClaimsOfficerName { get; set; }
+    public int? ClaimId { get; set; }
+    public string? ClaimStatus { get; set; }
 }

@@ -26,8 +26,10 @@
             <div class="space-y-1">
                 <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Plan:</span>
                     {{ req.plan?.planName || ('Plan ' + req.planId) }}</p>
-                <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Customer:</span>
-                    #{{ req.customerId }}</p>
+                <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Customer ID:</span>
+                    {{ req.customerId }}</p>
+                <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Customer Name:</span>
+                    {{ req.customer?.fullName }}</p>
             </div>
             <div class="pt-2">
                 <label class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">Notes for

@@ -77,30 +77,6 @@ namespace Infrastructure.Migrations
                             ReferralCode = "REF-1-ADMIN",
                             ReferralsCount = 0,
                             Role = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "claims@gmail.com",
-                            FullName = "Claims Officer",
-                            IsActive = true,
-                            PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..",
-                            ReferralBalance = 0m,
-                            ReferralCode = "REF-2-CLAIMS",
-                            ReferralsCount = 0,
-                            Role = 4
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "customer@gmail.com",
-                            FullName = "Customer",
-                            IsActive = true,
-                            PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..",
-                            ReferralBalance = 0m,
-                            ReferralCode = "REF-3-CUSTOMER",
-                            ReferralsCount = 0,
-                            Role = 3
                         });
                 });
 
@@ -112,8 +88,14 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AssignedOfficerId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("ClaimAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PhotoUrls")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PolicyRequestId")
                         .HasColumnType("int");
@@ -136,33 +118,11 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssignedOfficerId");
+
                     b.HasIndex("PolicyRequestId");
 
                     b.ToTable("Claims");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ClaimAmount = 5000m,
-                            PolicyRequestId = 1,
-                            PropertyAddress = "123 Main Street",
-                            PropertyAge = 10,
-                            PropertyValue = 1000000m,
-                            Remarks = "",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ClaimAmount = 15000m,
-                            PolicyRequestId = 2,
-                            PropertyAddress = "456 Commerce Road",
-                            PropertyAge = 5,
-                            PropertyValue = 5000000m,
-                            Remarks = "",
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Invoice", b =>
@@ -267,6 +227,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("FormType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Frequency")
                         .HasColumnType("int");
 
@@ -287,6 +250,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<int?>("PropertyAge")
                         .HasColumnType("int");
+
+                    b.Property<string>("PropertyDetailsJson")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("PropertyValue")
                         .HasColumnType("decimal(18,2)");
@@ -309,36 +275,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PlanId");
 
                     b.ToTable("PolicyRequests");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AdminNotes = "Initial seed policy",
-                            AgentCommissionAmount = 0m,
-                            CustomerId = 3,
-                            Frequency = 0,
-                            InstallmentAmount = 0m,
-                            InstallmentCount = 0,
-                            PlanId = 1,
-                            PremiumAmount = 0m,
-                            Status = 6,
-                            TotalPremium = 0m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AdminNotes = "Commercial seed policy",
-                            AgentCommissionAmount = 0m,
-                            CustomerId = 3,
-                            Frequency = 0,
-                            InstallmentAmount = 0m,
-                            InstallmentCount = 0,
-                            PlanId = 2,
-                            PremiumAmount = 0m,
-                            Status = 6,
-                            TotalPremium = 0m
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.PropertyCategory", b =>
@@ -421,7 +357,7 @@ namespace Infrastructure.Migrations
                             BasePremium = 8000m,
                             CoverageRate = 0.008m,
                             Frequency = 1,
-                            PlanName = "Business Liability Plus",
+                            PlanName = "Smart Business Protect",
                             SubCategoryId = 2
                         },
                         new
@@ -432,7 +368,7 @@ namespace Infrastructure.Migrations
                             BasePremium = 60000m,
                             CoverageRate = 0.012m,
                             Frequency = 2,
-                            PlanName = "Industrial Asset Guard",
+                            PlanName = "Plant Safety Plan",
                             SubCategoryId = 3
                         },
                         new
@@ -443,7 +379,7 @@ namespace Infrastructure.Migrations
                             BasePremium = 4500m,
                             CoverageRate = 0.006m,
                             Frequency = 3,
-                            PlanName = "Luxury Condo Shield",
+                            PlanName = "Luxury Plan – Signature Property Guard",
                             SubCategoryId = 1
                         });
                 });
@@ -534,11 +470,17 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Claim", b =>
                 {
-                    b.HasOne("Domain.Entities.PolicyRequest", "PolicyRequest")
+                    b.HasOne("Domain.Entities.ApplicationUser", "AssignedOfficer")
                         .WithMany()
+                        .HasForeignKey("AssignedOfficerId");
+
+                    b.HasOne("Domain.Entities.PolicyRequest", "PolicyRequest")
+                        .WithMany("Claims")
                         .HasForeignKey("PolicyRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AssignedOfficer");
 
                     b.Navigation("PolicyRequest");
                 });
@@ -629,6 +571,11 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.PolicyRequest", b =>
+                {
+                    b.Navigation("Claims");
                 });
 
             modelBuilder.Entity("Domain.Entities.PropertyCategory", b =>

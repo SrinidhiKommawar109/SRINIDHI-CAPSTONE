@@ -1,181 +1,102 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.Persistence;
-using Domain.Entities;
-using Domain.Enums;
 using Application.DTOs;
+using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ClaimEntity = Domain.Entities.Claim;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ClaimsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ClaimsController : ControllerBase
+    private readonly IClaimsService _claimsService;
+    private readonly IWebHostEnvironment _environment;
+
+    public ClaimsController(IClaimsService claimsService, IWebHostEnvironment environment)
     {
-        private readonly ApplicationDbContext _context;
+        _claimsService = claimsService;
+        _environment = environment;
+    }
 
-        public ClaimsController(ApplicationDbContext context)
+    [HttpPost]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> FileClaim([FromForm] CreateClaimDto dto, List<IFormFile>? photos)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized("User ID not found in token.");
+
+        var userId = int.Parse(userIdClaim.Value);
+
+        try
         {
-            _context = context;
-        }
-
-        // ================================
-        // 1️⃣ Customer files a claim
-        // ================================
-        [HttpPost]
-        [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> FileClaim(CreateClaimDto dto)
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-                return Unauthorized("User ID not found in token.");
-
-            var userId = int.Parse(userIdClaim.Value);
-
-            var policy = await _context.PolicyRequests
-                .FirstOrDefaultAsync(p => p.Id == dto.PolicyRequestId);
-
-            if (policy == null || policy.Status != PolicyRequestStatus.PolicyApproved)
-                return BadRequest("Invalid or unapproved policy.");
-
-            var claim = new ClaimEntity
+            if (photos != null && photos.Count > 0)
             {
-                PolicyRequestId = dto.PolicyRequestId,
-                PropertyAddress = dto.PropertyAddress,
-                PropertyValue = dto.PropertyValue,
-                PropertyAge = dto.PropertyAge,
-                ClaimAmount = policy.PremiumAmount,
-                Status = ClaimStatus.Pending,
-                Remarks = ""
-            };
+                var baseRoot = _environment.WebRootPath ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+                var uploadPath = Path.Combine(baseRoot, "uploads", "claims");
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
 
-            _context.Claims.Add(claim);
-            
-            var claimsOfficers = await _context.Users.Where(u => u.Role == UserRole.ClaimsOfficer).ToListAsync();
-            foreach (var co in claimsOfficers)
-            {
-                _context.Notifications.Add(new Notification
+                var savedPaths = new List<string>();
+                foreach (var file in photos)
                 {
-                    UserId = co.Id,
-                    Title = "New Claim Filed",
-                    Message = $"A new claim has been filed for policy ID {dto.PolicyRequestId}.",
-                    Type = "info"
-                });
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var filePath = Path.Combine(uploadPath, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    savedPaths.Add("/uploads/claims/" + fileName);
+                }
+                dto.PhotoPaths = string.Join(",", savedPaths);
             }
 
-            await _context.SaveChangesAsync();
-
+            await _claimsService.FileClaimAsync(dto, userId);
             return Ok("Claim request sent successfully.");
         }
-
-        // ================================
-        // 2️⃣ Claims Officer views pending claims
-        // ================================
-        [HttpGet("pending")]
-        [Authorize(Roles = "ClaimsOfficer")]
-        public async Task<IActionResult> GetPendingClaims()
+        catch (InvalidOperationException ex)
         {
-            var claims = await _context.Claims
-                .Include(c => c.PolicyRequest)
-                    .ThenInclude(p => p.Plan)
-                .Include(c => c.PolicyRequest)
-                    .ThenInclude(p => p.Customer)
-                .Where(c => c.Status == ClaimStatus.Pending)
-                .ToListAsync();
-
-            return Ok(claims);
+            return BadRequest(ex.Message);
         }
+    }
 
-        [HttpGet("history")]
-        [Authorize(Roles = "ClaimsOfficer")]
-        public async Task<IActionResult> GetClaimsHistory()
+    [HttpGet("pending")]
+    [Authorize(Roles = "ClaimsOfficer")]
+    public async Task<IActionResult> GetPendingClaims()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        int? userId = userIdClaim != null ? int.Parse(userIdClaim.Value) : null;
+        
+        var claims = await _claimsService.GetPendingClaimsAsync(userId);
+        return Ok(claims);
+    }
+
+    [HttpGet("history")]
+    [Authorize(Roles = "ClaimsOfficer")]
+    public async Task<IActionResult> GetClaimsHistory()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        int? userId = userIdClaim != null ? int.Parse(userIdClaim.Value) : null;
+        
+        var claims = await _claimsService.GetClaimsHistoryAsync(userId);
+        return Ok(claims);
+    }
+
+    [HttpPut("{id}/verify")]
+    [Authorize(Roles = "ClaimsOfficer")]
+    public async Task<IActionResult> VerifyClaim(int id, [FromBody] VerifyClaimDto dto)
+    {
+        try
         {
-            var claims = await _context.Claims
-                .Include(c => c.PolicyRequest)
-                    .ThenInclude(p => p.Plan)
-                .Include(c => c.PolicyRequest)
-                    .ThenInclude(p => p.Customer)
-                .Where(c => c.Status != ClaimStatus.Pending)
-                .OrderByDescending(c => c.Id)
-                .ToListAsync();
-
-            return Ok(claims);
+            var result = await _claimsService.VerifyClaimAsync(id, dto);
+            return Ok(result);
         }
-
-        // ================================
-        // 3️⃣ Claims Officer verifies claim
-        // ================================
-        [HttpPut("{id}/verify")]
-        [Authorize(Roles = "ClaimsOfficer")]
-        public async Task<IActionResult> VerifyClaim(int id, [FromBody] VerifyClaimDto dto)
+        catch (InvalidOperationException ex)
         {
-            var claim = await _context.Set<ClaimEntity>().FindAsync(id);
-            if (claim == null)
+            if (ex.Message.Contains("not found"))
                 return NotFound();
-
-            if (claim.Status != ClaimStatus.Pending)
-                return BadRequest("Claim already processed.");
-
-            if (dto.IsAccepted)
-            {
-                claim.Status = ClaimStatus.Approved;
-                var policy = await _context.PolicyRequests
-    .Include(p => p.Plan)
-    .FirstOrDefaultAsync(p => p.Id == claim.PolicyRequestId);
-
-                var invoice = new Invoice
-                {
-                    PolicyRequestId = policy.Id,
-                    InvoiceNumber = "INV-" + Guid.NewGuid().ToString().Substring(0, 8),
-                    GeneratedDate = DateTime.UtcNow,
-                    TotalPremium = policy.TotalPremium,
-                    InstallmentAmount = policy.InstallmentAmount,
-                    InstallmentCount = policy.InstallmentCount,
-                    ClaimAmount = claim.ClaimAmount,
-                    PlanName = policy.Plan.PlanName,
-                    CustomerId = policy.CustomerId
-                };
-
-                _context.Invoices.Add(invoice);
-
-                _context.Notifications.Add(new Notification
-                {
-                    UserId = policy.CustomerId,
-                    Title = "Claim Approved",
-                    Message = $"Your claim for {policy.Plan.PlanName} has been approved. Invoice {invoice.InvoiceNumber} generated.",
-                    Type = "success"
-                });
-
-                await _context.SaveChangesAsync();
-                claim.Remarks = dto.Remarks ?? "Claim accepted";
-                await _context.SaveChangesAsync();
-                return Ok("Insurance has been claimed ✅");
-            }
-            else
-            {
-                claim.Status = ClaimStatus.Rejected;
-                claim.Remarks = dto.Remarks ?? "Claim rejected";
-
-                var claimRequest = await _context.Claims
-                    .Include(c => c.PolicyRequest)
-                    .FirstOrDefaultAsync(c => c.Id == id);
-
-                if (claimRequest != null)
-                {
-                    _context.Notifications.Add(new Notification
-                    {
-                        UserId = claimRequest.PolicyRequest.CustomerId,
-                        Title = "Claim Rejected",
-                        Message = $"Your claim for request ID {claimRequest.PolicyRequestId} has been rejected. Remarks: {claim.Remarks}",
-                        Type = "error"
-                    });
-                }
-
-                await _context.SaveChangesAsync();
-                return Ok("Claim rejected ❌");
-            }
+            return BadRequest(ex.Message);
         }
     }
 }

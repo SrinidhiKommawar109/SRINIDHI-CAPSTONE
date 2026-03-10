@@ -5,6 +5,7 @@ import {
     PolicyRequestsService,
     PropertyPlan,
 } from '../../../../core/policy-requests.service';
+import { AdminService } from '../../../../core/admin.service';
 import { NotificationsService } from '../../../../core/notifications.service';
 
 @Component({
@@ -15,24 +16,45 @@ import { NotificationsService } from '../../../../core/notifications.service';
 })
 export class CustomerBrowseComponent implements OnInit {
     private readonly policies = inject(PolicyRequestsService);
+    private readonly adminService = inject(AdminService);
     private readonly notifications = inject(NotificationsService);
     private readonly cdr = inject(ChangeDetectorRef);
 
     plans: PropertyPlan[] = [];
+    subCategories: any[] = [];
+    selectedSubCategoryId: number = 0;
     createMessage = '';
 
     ngOnInit(): void {
         this.loadPlans();
+        this.loadSubCategories();
+    }
+
+    loadSubCategories(): void {
+        this.adminService.getCategories().subscribe({
+            next: (cats: any[]) => {
+                // Flatten subcategories from all categories
+                this.subCategories = cats.reduce((acc: any[], cat: any) => {
+                    return [...acc, ...(cat.subCategories || [])];
+                }, []);
+                this.cdr.detectChanges();
+            },
+            error: () => this.cdr.detectChanges(),
+        });
     }
 
     loadPlans(): void {
-        this.policies.getAllPlans().subscribe({
+        this.policies.getAllPlans(this.selectedSubCategoryId || undefined).subscribe({
             next: (plans) => {
                 this.plans = plans;
                 this.cdr.detectChanges();
             },
             error: () => this.cdr.detectChanges(),
         });
+    }
+
+    onFilterChange(): void {
+        this.loadPlans();
     }
 
     getInstallmentAmount(plan: PropertyPlan): number {

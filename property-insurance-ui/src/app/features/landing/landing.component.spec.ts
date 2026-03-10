@@ -33,10 +33,10 @@ describe('LandingComponent', () => {
 
     it('should toggle like options', () => {
         const option = 'Policy Variety';
-        expect(component.isLikeSelected(option)).toBeFalse();
+        expect(component.isLikeSelected(option)).toBe(false);
         component.toggleLike(option);
-        expect(component.isLikeSelected(option)).toBeTrue();
+        expect(component.isLikeSelected(option)).toBe(true);
         component.toggleLike(option);
-        expect(component.isLikeSelected(option)).toBeFalse();
+        expect(component.isLikeSelected(option)).toBe(false);
     });
 });

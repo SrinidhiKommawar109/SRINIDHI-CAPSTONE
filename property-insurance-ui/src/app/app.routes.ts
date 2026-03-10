@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { LandingComponent } from './features/landing/landing.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { NotFoundComponent } from './features/not-found/not-found.component';
+import { ErrorComponent } from './features/error/error.component';
 import { AdminDashboardComponent } from './features/dashboard/admin/admin-dashboard.component';
 import { AgentDashboardComponent } from './features/dashboard/agent/agent-dashboard.component';
 import { CustomerDashboardComponent } from './features/dashboard/customer/customer-dashboard.component';
@@ -12,6 +12,7 @@ import { AdminAssignAgentsComponent } from './features/dashboard/admin/admin-ass
 import { AdminApprovalsComponent } from './features/dashboard/admin/admin-approvals/admin-approvals.component';
 import { AdminAnalyticsComponent } from './features/dashboard/admin/admin-analytics/admin-analytics.component';
 import { AdminUserManagementComponent } from './features/dashboard/admin/admin-user-management/admin-user-management.component';
+import { AdminPolicyManagementComponent } from './features/dashboard/admin/admin-policy-management/admin-policy-management.component';
 import { CustomerBrowseComponent } from './features/dashboard/customer/customer-browse/customer-browse.component';
 import { CustomerRequestsComponent } from './features/dashboard/customer/customer-requests/customer-requests.component';
 import { CustomerClaimsComponent } from './features/dashboard/customer/customer-claims/customer-claims.component';
@@ -39,6 +40,7 @@ export const routes: Routes = [
       { path: 'approvals', component: AdminApprovalsComponent },
       { path: 'analytics', component: AdminAnalyticsComponent },
       { path: 'user-management', component: AdminUserManagementComponent },
+      { path: 'policy-management', component: AdminPolicyManagementComponent },
     ],
   },
   {
@@ -77,5 +79,6 @@ export const routes: Routes = [
       { path: 'history', component: ClaimsHistoryComponent },
     ],
   },
-  { path: '**', component: NotFoundComponent },
+  { path: 'error', component: ErrorComponent },
+  { path: '**', component: ErrorComponent }
 ];

@@ -27,9 +27,11 @@
                 <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Plan:</span>
                     {{ req.plan?.planName || ('Plan ' + req.planId) }}</p>
                 <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Customer:</span>
-                    #{{ req.customerId }}</p>
+                    {{ req.customerId }}</p>
                 <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Agent:</span>
-                    #{{ req.agentId }}</p>
+                    {{ req.agentId }}</p>
+                <p><span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Customer Name:</span>
+                    {{ req.customer?.fullName }}</p>
             </div>
             <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button type="button"

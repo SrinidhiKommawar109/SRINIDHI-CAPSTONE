@@ -39,8 +39,11 @@
                                 {{ claim.status }}
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">{{ claim.policyRequest?.plan?.planName }} • {{
-                            claim.policyRequest?.customer?.fullName }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            {{ claim.policyRequest?.plan?.planName }} • {{ claim.policyRequest?.customer?.fullName }}
+                            <span *ngIf="claim.assignedOfficer" class="opacity-70 mx-1">|</span>
+                            {{ claim.assignedOfficer?.fullName }}
+                        </p>
                     </div>
                 </div>
                 <div

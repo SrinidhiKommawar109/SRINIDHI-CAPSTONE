@@ -49,6 +49,8 @@
                             <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Request</th>
                             <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Customer</th>
                             <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Admin Notes</th>
+                            <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100 text-center">Risk
+                                Score</th>
                             <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Status</th>
                             <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100 text-right">
                                 Actions</th>
@@ -70,6 +72,14 @@
                                     {{ req.adminNotes || 'No notes provided' }}
                                 </p>
                             </td>
+                            <td class="px-6 py-4 text-center">
+                                <span *ngIf="req.riskScore !== undefined"
+                                    class="font-bold text-sky-600 dark:text-sky-400">
+                                    {{ req.riskScore }}
+                                </span>
+                                <span *ngIf="req.riskScore === undefined"
+                                    class="text-slate-300 dark:text-slate-700">--</span>
+                            </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
                                     [ngClass]="{
@@ -88,14 +98,27 @@
                                         class="rounded border border-slate-200 bg-white px-3 py-1 text-[10px] font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
                                         View Details
                                     </button>
-                                    <button *ngIf="req.status === 'AgentAssigned'" (click)="sendForm(req.id)"
+                                    <button *ngIf="req.status === 'AgentAssigned'" (click)="openFormSelection(req.id)"
                                         class="rounded bg-sky-600 px-3 py-1 text-[10px] font-bold text-white hover:bg-sky-500">
                                         Send Form
                                     </button>
-                                    <button *ngIf="req.status === 'FormSubmitted'" (click)="calculateRisk(req.id)"
+                                    <button *ngIf="req.status === 'FormSubmitted' && calculatingRequestId !== req.id"
+                                        (click)="calculateRisk(req.id)"
                                         class="rounded bg-emerald-600 px-3 py-1 text-[10px] font-bold text-white hover:bg-emerald-500">
                                         Calculate Risk
                                     </button>
+                                    <div *ngIf="calculatingRequestId === req.id"
+                                        class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                                        <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                            </path>
+                                        </svg>
+                                        <span class="text-[10px] font-bold">Calculating...</span>
+                                    </div>
                                     <span *ngIf="req.status === 'RiskCalculated'"
                                         class="text-[10px] text-slate-400 font-medium">Awaiting Customer</span>
                                     <span *ngIf="req.status === 'FormSent'"
@@ -214,6 +237,68 @@
                 <button (click)="closeDetails()"
                     class="w-full rounded-xl bg-slate-900 py-3 text-sm font-bold text-white hover:bg-slate-800 transition-colors dark:bg-slate-50 dark:text-slate-950 dark:hover:bg-slate-200">
                     Close Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Selection Overlay -->
+    <div *ngIf="selectedFormRequestId"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+        <div
+            class="w-full max-w-md scale-in-center rounded-2xl border border-slate-200 bg-white p-8 shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-in zoom-in-95 duration-300">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Select Property Form</h3>
+                    <p class="text-xs text-slate-500">Choose the specific form needed for Request #{{ selectedFormRequestId }}</p>
+                </div>
+                <button (click)="closeFormSelection()"
+                    class="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <button (click)="selectedFormType = 'Residential'"
+                        [ngClass]="selectedFormType === 'Residential' ? 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 font-bold' : 'border-slate-200 hover:border-sky-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:border-slate-700 dark:text-slate-300'"
+                        class="rounded-xl border p-4 text-center transition-all">
+                        <div class="text-sm">🏠 Residential</div>
+                    </button>
+                    <button (click)="selectedFormType = 'Commercial'"
+                        [ngClass]="selectedFormType === 'Commercial' ? 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 font-bold' : 'border-slate-200 hover:border-sky-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:border-slate-700 dark:text-slate-300'"
+                        class="rounded-xl border p-4 text-center transition-all">
+                        <div class="text-sm">🏢 Commercial</div>
+                    </button>
+                    <button (click)="selectedFormType = 'Industrial'"
+                        [ngClass]="selectedFormType === 'Industrial' ? 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 font-bold' : 'border-slate-200 hover:border-sky-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:border-slate-700 dark:text-slate-300'"
+                        class="rounded-xl border p-4 text-center transition-all">
+                        <div class="text-sm">🏭 Industrial</div>
+                    </button>
+                    <button (click)="selectedFormType = 'Contents'"
+                        [ngClass]="selectedFormType === 'Contents' ? 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 font-bold' : 'border-slate-200 hover:border-sky-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:border-slate-700 dark:text-slate-300'"
+                        class="rounded-xl border p-4 text-center transition-all">
+                        <div class="text-sm">📦 Contents</div>
+                    </button>
+                </div>
+                
+                <p class="text-[10px] text-slate-500 text-center mt-2">
+                    The customer will only see fields relevant to the {{ selectedFormType }} property type.
+                </p>
+            </div>
+
+            <div class="mt-8 flex gap-3">
+                <button (click)="closeFormSelection()"
+                    class="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 transition-colors dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                    Cancel
+                </button>
+                <button (click)="confirmSendForm()"
+                    class="w-full rounded-xl bg-sky-600 py-3 text-sm font-bold text-white hover:bg-sky-500 transition-colors shadow-sm shadow-sky-500/20">
+                    Send to Customer
                 </button>
             </div>
         </div>

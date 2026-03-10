@@ -19,6 +19,11 @@ export class AgentTasksComponent implements OnInit {
     lastRisk: CalculateRiskResponse | null = null;
     selectedRequestDetails: PolicyRequest | null = null;
     errorMessage = '';
+    calculatingRequestId: number | null = null;
+
+    // Form Selection State
+    selectedFormRequestId: number | null = null;
+    selectedFormType: string = 'Residential';
 
     ngOnInit(): void {
         this.loadAssignedRequests();
@@ -40,19 +45,31 @@ export class AgentTasksComponent implements OnInit {
         });
     }
 
-    sendForm(requestId: number): void {
-        if (!requestId) {
-            return;
-        }
+    openFormSelection(requestId: number): void {
+        this.selectedFormRequestId = requestId;
+        this.selectedFormType = 'Residential'; // Default
+    }
+
+    closeFormSelection(): void {
+        this.selectedFormRequestId = null;
+    }
+
+    confirmSendForm(): void {
+        if (!this.selectedFormRequestId) return;
+
+        const requestId = this.selectedFormRequestId;
+        const formType = this.selectedFormType;
+
         this.errorMessage = '';
-        this.policies.sendForm(requestId).subscribe({
+        this.policies.sendForm(requestId, formType).subscribe({
             next: () => {
                 this.notifications.show({
                     title: 'Form sent',
-                    message: `Request #${requestId} sent to customer.`,
+                    message: `${formType} form sent to customer for Request #${requestId}.`,
                     type: 'success',
                 });
-                this.cdr.detectChanges();
+                this.closeFormSelection();
+                this.loadAssignedRequests(); // Refresh table state
             },
             error: (err) => {
                 this.errorMessage = this.extractError(err);
@@ -66,21 +83,30 @@ export class AgentTasksComponent implements OnInit {
             return;
         }
         this.errorMessage = '';
-        this.policies.calculateRisk(requestId).subscribe({
-            next: (res) => {
-                this.lastRisk = res;
-                this.notifications.show({
-                    title: 'Risk calculated',
-                    message: 'Premium and commission calculated.',
-                    type: 'success',
-                });
-                this.cdr.detectChanges();
-            },
-            error: (err) => {
-                this.errorMessage = this.extractError(err);
-                this.cdr.detectChanges();
-            },
-        });
+        this.calculatingRequestId = requestId;
+        this.cdr.detectChanges();
+
+        // Simulate "calculation work"
+        setTimeout(() => {
+            this.policies.calculateRisk(requestId).subscribe({
+                next: (res) => {
+                    this.lastRisk = res;
+                    this.calculatingRequestId = null;
+                    this.notifications.show({
+                        title: 'Risk calculated',
+                        message: 'Premium and commission calculated.',
+                        type: 'success',
+                    });
+                    this.loadAssignedRequests(); // Refresh table to show score
+                    this.cdr.detectChanges();
+                },
+                error: (err) => {
+                    this.calculatingRequestId = null;
+                    this.errorMessage = this.extractError(err);
+                    this.cdr.detectChanges();
+                },
+            });
+        }, 2500);
     }
 
     viewDetails(req: PolicyRequest): void {

@@ -61,13 +61,27 @@
         class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <h2 class="text-sm font-semibold text-slate-900 dark:text-white">Active Users</h2>
-            <button (click)="loadStaff()"
-                class="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Refresh</button>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by name, email, role..."
+                        class="w-64 pl-9 pr-4 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:bg-slate-800/50 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400" />
+                </div>
+                <button (click)="loadStaff()"
+                    class="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Refresh</button>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50">
+                        <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white uppercase tracking-wider">ID
+                        </th>
                         <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Name
                         </th>
                         <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white uppercase tracking-wider">
@@ -77,7 +91,9 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    <tr *ngFor="let s of staff" class="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50">
+                    <tr *ngFor="let s of filteredStaff"
+                        class="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50">
+                        <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">{{ s.id }}</td>
                         <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">{{ s.fullName }}</td>
                         <td class="px-6 py-4 text-slate-500 dark:text-slate-400">{{ s.email }}</td>
                         <td class="px-6 py-4">
@@ -92,8 +108,9 @@
                             </span>
                         </td>
                     </tr>
-                    <tr *ngIf="staff.length === 0">
-                        <td colspan="3" class="px-6 py-10 text-center text-slate-400 italic">No users found.</td>
+                    <tr *ngIf="filteredStaff.length === 0">
+                        <td colspan="4" class="px-6 py-10 text-center text-slate-400 italic">No users found matching
+                            your search.</td>
                     </tr>
                 </tbody>
             </table>

@@ -20,5 +20,8 @@ namespace Domain.Entities
         public ClaimStatus Status { get; set; } = ClaimStatus.Pending;
 
         public string? Remarks { get; set; } // for officer comments
+        public int? AssignedOfficerId { get; set; }
+        public ApplicationUser? AssignedOfficer { get; set; }
+        public string? PhotoUrls { get; set; } // comma separated paths
     }
 }

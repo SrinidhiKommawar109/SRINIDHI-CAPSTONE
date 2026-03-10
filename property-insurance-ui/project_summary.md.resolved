@@ -1,0 +1,73 @@
+# PropShield: Property Insurance Management System
+**Project Summary for Presentation Generation**
+
+This document provides a comprehensive overview of the PropShield project, structured to easily translate into a PowerPoint presentation.
+
+---
+
+## 1. Executive Summary
+**PropShield** is a modern, full-stack web application designed to digitize and streamline the end-to-end lifecycle of property insurance. It provides a secure, role-based platform bridging the gap between Customers seeking insurance, Agents evaluating risks, Claims Officers processing incidents, and Administrators overseeing the entire operation.
+
+## 2. Comprehensive Technology Stack
+**Frontend (Client-Side)**
+*   **Framework:** Angular (v18+) using the Standalone Components architecture for maximum performance and modularity.
+*   **Styling & UI:** Tailwind CSS for a highly responsive, modern, and clean user interface.
+*   **Routing & State:** Angular Router, RxJS for reactive state management and API communication.
+*   **Testing:** Vitest for rapid, reliable unit testing.
+
+**Backend (Server-Side)**
+*   **Framework:** ASP.NET Core Web API (.NET 8) written in C#.
+*   **Architecture:** Clean Architecture pattern (Domain, Application, Infrastructure, API layers) ensuring separation of concerns.
+*   **ORM / Database:** Entity Framework Core (EF Core) interacting with a SQL Server database.
+*   **Authentication & Security:** JWT (JSON Web Tokens) for secure, stateless role-based user sessions, paired with ASP.NET Identity.
+*   **Testing:** xUnit and Moq for comprehensive backend unit testing.
+
+## 3. User Roles & Personas
+The system utilizes strict Role-Based Access Control (RBAC) with four distinct personas:
+1.  **Customer:** Browses insurance plans, requests policies, submits property details, processes payments, and files incident claims.
+2.  **Agent:** Acts as the middleman; reviews property details, calculates risk scores, adjusts premiums, and sends finalized quotes to customers.
+3.  **Claims Officer:** Specializes exclusively in reviewing submitted claims, validating evidence (photos), and either approving or rejecting the payout.
+4.  **Administrator (Admin):** The system overseer. Manages the catalog of insurance plans, assigns Agents to new requests, gives final approval on purchased policies, and monitors system-wide analytics.
+
+## 4. Core Modules & Workflows
+
+### A. Policy Acquisition & Premium Calculation
+1.  **Browse & Select:** Customers filter and select property plans based on categories (e.g., Residential, Commercial).
+2.  **Request & Assign:** Customer submits a request. Admin assigns an available Agent.
+3.  **Risk & Premium Calculation:** 
+    *   *Base Formula:* Standard premium defined by the selected plan (e.g., ₹1,000 for Basic Fire Insurance).
+    *   *Agent's Role:* The Agent inspects property details (Value, Age, Location) and manually assigns a **Risk Score** (e.g., 1.2 for higher risk).
+    *   *Final Premium Math:* `Final Premium = Base Premium * Risk Score`.
+    *   *Agent Commission:* `Commission = Base Premium * (Agent Commission % / 100)`.
+4.  **Payment & Approval:** Customer reviews the Agent's adjusted quote, enters payment details, and completes checkout. Admin provides final approval.
+
+### B. Claims Management & Calculation
+1.  **File Claim:** Customer submits a claim providing an *Impacted Value* (Claim Amount) and photos.
+    *   **Crucial System Validation (The Claim Calculation):** The system protects against fraud by calculating the Absolute Maximum Coverage limit.
+    *   *Math:* `Max Coverage = Property Value * Coverage Rate %`.
+    *   *Example:* For a ₹1,200,000 property on a plan that covers 85% (`0.85`), `Max Coverage = 1,200,000 * 0.85 = ₹1,020,000`. If the customer enters an Impacted Value greater than ₹1,020,000, the system automatically rejects the submission.
+2.  **Officer Review:** The system auto-assigns the claim to the Claims Officer with the lowest current workload for fairness. The officer reviews evidence and approves/rejects.
+3.  **Resolution & Invoicing:** If approved, a PDF-style Invoice is generated detailing the approved payout amount.
+
+## 5. Testing & Passed Test Cases
+We employ a rigorous testing methodology across the stack. Below are key scenarios that successfully pass 100% in our test suites:
+
+**Frontend Pass Cases (Vitest)**
+*   [CustomerBrowseComponent](file:///e:/Capstone/property-insurance-ui/src/app/features/dashboard/customer/customer-browse/customer-browse.component.ts#11-94): Successfully filters insurance plans by `subCategoryId` dynamically when dropdown changes.
+*   [AdminManagePlansComponent](file:///e:/Capstone/property-insurance-ui/src/app/features/dashboard/admin/admin-manage-plans/admin-manage-plans.component.ts#7-118): Successfully intercepts "Delete Plan" action, calls the correct API endpoint, and removes the plan from the UI table upon success.
+*   [CustomerClaimsComponent](file:///e:/Capstone/property-insurance-ui/src/app/features/dashboard/customer/customer-claims/customer-claims.component.ts#7-56): Forms block submission and display error messages if Claim Amount > 0 validation fails locally.
+
+**Backend Pass Cases (xUnit & Moq)**
+*   `ClaimsService.FileClaimAsync`: **PASS** - Correctly throws `InvalidOperationException` if a user attempts to file a claim amount exceeding the mathematical limit (`PropertyValue * CoverageRate`).
+*   `ClaimsService.FileClaimAsync`: **PASS** - Successfully finds the Claims Officer with the lowest active workload and dynamically assigns them the newly created claim entity.
+*   `PropertyPlansController.DeletePlan`: **PASS** - Validates Admin authentication, locates plan by ID, successfully removes entity via [IPropertyPlanService](file:///e:/Capstone/PropertyInsuranceSystem/Application/Interfaces/IPropertyPlanService.cs#6-13), and triggers EF Core [SaveChangesAsync()](file:///e:/Capstone/PropertyInsuranceSystem/Infrastructure/Repositories/Repository.cs#48-52).
+*   `PolicyRequestService.GetAllRequestsAsync`: **PASS** - Successfully performs a multi-table JOIN across Users, Plans, PolicyRequests, and Claims, reshaping the data accurately into a flattened [PolicyRequestResponseDto](file:///e:/Capstone/PropertyInsuranceSystem/Application/DTOs/PolicyRequestResponseDto.cs#5-29) for the Admin Dashboard.
+
+## 6. Recent Technical Enhancements
+*(Highlights to showcase recent development progress)*
+*   **Dynamic Validations:** Implemented robust frontend and backend mathematical validations (as detailed in Section 4B) to prevent fraudulent entries.
+*   **Consolidated Admin Dashboard:** Built a complex data-join view allowing Admins to see every policy, its associated customer, assigned agent, and real-time claim status in a single unified table.
+*   **Entity Framework Migrations:** Successfully configured database schemas with fluid relationships (one-to-many, many-to-one) navigating between Users, Policies, and Claims, resolving previous file-lock architecture blockers.
+
+---
+*Tip for Claude/PPT Generation: Use Section 3 for a "Target Audience" slide, Section 4 for "Workflow & Mathematics" slides, Section 2 for a "Tech Stack" slide, and Section 5 for a "Quality Assurance & Testing" slide.*

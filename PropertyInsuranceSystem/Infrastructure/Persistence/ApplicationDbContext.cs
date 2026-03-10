@@ -1,4 +1,4 @@
-ï»¿using Domain.Entities;
+using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +30,11 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        // Fix decimal precision warnings
+        foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(t => t.GetProperties()).Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+        {
+            property.SetColumnType("decimal(18,2)");
+        }
 
         modelBuilder.Entity<Invoice>()
         .HasOne(i => i.Customer)
@@ -73,32 +78,13 @@ public class ApplicationDbContext : DbContext
                 Role = UserRole.Admin,
                 ReferralCode = "REF-1-ADMIN",
                 IsActive = true
-            },
-            new ApplicationUser
-            {
-                Id = 2,
-                FullName = "Claims Officer",
-                Email = "claims@gmail.com",
-                PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..", // Claims@123
-                Role = UserRole.ClaimsOfficer,
-                ReferralCode = "REF-2-CLAIMS",
-                IsActive = true
-            },
-            new ApplicationUser
-            {
-                Id = 3,
-                FullName = "Customer",
-                Email = "customer@gmail.com",
-                PasswordHash = "$2a$11$kkF9EKe7KJxAijZ374He4edBGTSujLGRA48MkMwN9g6PK77IM2H..", // Customer@123
-                Role = UserRole.Customer,
-                ReferralCode = "REF-3-CUSTOMER",
-                IsActive = true
             }
         );
 
         // ---- PROPERTY CATEGORY ----
         modelBuilder.Entity<PropertyCategory>().HasData(
             new PropertyCategory { Id = 1, Name = "Property Insurance" }
+            
         );
 
         // ---- SUBCATEGORIES ----
@@ -112,57 +98,9 @@ public class ApplicationDbContext : DbContext
         // ---- PLANS ----
         modelBuilder.Entity<PropertyPlans>().HasData(
             new PropertyPlans { Id = 1, PlanName = "Standard Home Protection", BaseCoverageAmount = 250000, CoverageRate = 0.005m, BasePremium = 1250, AgentCommission = 125, Frequency = PremiumFrequency.Yearly, SubCategoryId = 1 },
-            new PropertyPlans { Id = 2, PlanName = "Business Liability Plus", BaseCoverageAmount = 1000000, CoverageRate = 0.008m, BasePremium = 8000, AgentCommission = 600, Frequency = PremiumFrequency.Quarterly, SubCategoryId = 2 },
-            new PropertyPlans { Id = 3, PlanName = "Industrial Asset Guard", BaseCoverageAmount = 5000000, CoverageRate = 0.012m, BasePremium = 60000, AgentCommission = 4500, Frequency = PremiumFrequency.HalfYearly, SubCategoryId = 3 },
-            new PropertyPlans { Id = 4, PlanName = "Luxury Condo Shield", BaseCoverageAmount = 750000, CoverageRate = 0.006m, BasePremium = 4500, AgentCommission = 400, Frequency = PremiumFrequency.Yearly, SubCategoryId = 1 }
-        );
-
-        // ---- POLICY REQUESTS (Parent for Claims) ----
-        modelBuilder.Entity<PolicyRequest>().HasData(
-            new PolicyRequest
-            {
-                Id = 1,
-                PlanId = 1,
-                CustomerId = 3, // Customer
-                Status = PolicyRequestStatus.PolicyApproved,
-                AgentId = null,
-                AdminNotes = "Initial seed policy"
-            },
-            new PolicyRequest
-            {
-                Id = 2,
-                PlanId = 2,
-                CustomerId = 3,
-                Status = PolicyRequestStatus.PolicyApproved,
-                AgentId = null,
-                AdminNotes = "Commercial seed policy"
-            }
-        );
-
-        // ---- CLAIMS (Children, after PolicyRequests) ----
-        modelBuilder.Entity<Claim>().HasData(
-            new Claim
-            {
-                Id = 1,
-                PolicyRequestId = 1,
-                PropertyAddress = "123 Main Street",
-                PropertyValue = 1000000,
-                PropertyAge = 10,
-                ClaimAmount = 5000, // could match BasePremium
-                Status = ClaimStatus.Pending,
-                Remarks = ""
-            },
-            new Claim
-            {
-                Id = 2,
-                PolicyRequestId = 2,
-                PropertyAddress = "456 Commerce Road",
-                PropertyValue = 5000000,
-                PropertyAge = 5,
-                ClaimAmount = 15000,
-                Status = ClaimStatus.Pending,
-                Remarks = ""
-            }
+            new PropertyPlans { Id = 2, PlanName = "Smart Business Protect", BaseCoverageAmount = 1000000, CoverageRate = 0.008m, BasePremium = 8000, AgentCommission = 600, Frequency = PremiumFrequency.Quarterly, SubCategoryId = 2 },
+            new PropertyPlans { Id = 3, PlanName = "Plant Safety Plan", BaseCoverageAmount = 5000000, CoverageRate = 0.012m, BasePremium = 60000, AgentCommission = 4500, Frequency = PremiumFrequency.HalfYearly, SubCategoryId = 3 },
+            new PropertyPlans { Id = 4, PlanName = "Luxury Plan – Signature Property Guard", BaseCoverageAmount = 750000, CoverageRate = 0.006m, BasePremium = 4500, AgentCommission = 400, Frequency = PremiumFrequency.Yearly, SubCategoryId = 1 }
         );
     }
 }

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AgentDashboardComponent } from './agent-dashboard.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CommonModule } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('AgentDashboardComponent', () => {
     let component: AgentDashboardComponent;
@@ -9,7 +10,7 @@ describe('AgentDashboardComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [AgentDashboardComponent, HttpClientTestingModule, CommonModule],
+            imports: [AgentDashboardComponent, HttpClientTestingModule, CommonModule, RouterTestingModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AgentDashboardComponent);

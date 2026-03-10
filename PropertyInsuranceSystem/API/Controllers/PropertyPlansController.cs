@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Infrastructure.Persistence;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Application.DTOs;
+using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
@@ -11,14 +9,13 @@ namespace API.Controllers;
 [ApiController]
 public class PropertyPlansController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IPropertyPlanService _propertyPlanService;
 
-    public PropertyPlansController(ApplicationDbContext context)
+    public PropertyPlansController(IPropertyPlanService propertyPlanService)
     {
-        _context = context;
+        _propertyPlanService = propertyPlanService;
     }
 
-    // ✅ POST: api/PropertyPlans
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreatePlan([FromBody] CreatePropertyPlanDto dto)
@@ -26,55 +23,56 @@ public class PropertyPlansController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var subCategory = await _context.PropertySubCategories
-            .FirstOrDefaultAsync(s => s.Id == dto.SubCategoryId);
-
-        if (subCategory == null)
-            return NotFound("SubCategory not found");
-
-        var plan = new PropertyPlans
+        try
         {
-            PlanName = dto.PlanName,
-            BaseCoverageAmount = dto.BaseCoverageAmount,
-            CoverageRate = dto.CoverageRate,
-            BasePremium = dto.BasePremium,
-            AgentCommission = dto.AgentCommission,
-            Frequency = (Domain.Enums.PremiumFrequency)dto.Frequency,
-            SubCategoryId = dto.SubCategoryId,
-        };
-
-        _context.PropertyPlans.Add(plan);
-        await _context.SaveChangesAsync();
-
-        return Ok(new
+            var result = await _propertyPlanService.CreatePlanAsync(dto);
+            return Ok(new
+            {
+                result.Id,
+                result.PlanName,
+                result.BaseCoverageAmount,
+                result.CoverageRate,
+                result.BasePremium,
+                result.AgentCommission,
+                result.Frequency,
+                result.SubCategoryId
+            });
+        }
+        catch (InvalidOperationException ex)
         {
-            plan.Id,
-            plan.PlanName,
-            plan.BaseCoverageAmount,
-            plan.CoverageRate,
-            plan.BasePremium,
-            plan.AgentCommission,
-            plan.Frequency,
-            plan.SubCategoryId
-        });
+            return NotFound(ex.Message);
+        }
     }
-    // ✅ GET: api/PropertyPlans
+
     [HttpGet]
-    public async Task<IActionResult> GetAllPlans()
+    public async Task<IActionResult> GetAllPlans([FromQuery] int? subCategoryId)
     {
-        var plans = await _context.PropertyPlans.ToListAsync();
+        var plans = await _propertyPlanService.GetAllPlansAsync(subCategoryId);
         return Ok(plans);
     }
 
-    // ✅ GET: api/PropertyPlans/5
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlanById(int id)
     {
-        var plan = await _context.PropertyPlans.FindAsync(id);
-
+        var plan = await _propertyPlanService.GetPlanByIdAsync(id);
         if (plan == null)
             return NotFound();
 
         return Ok(plan);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeletePlan(int id)
+    {
+        try
+        {
+            await _propertyPlanService.DeletePlanAsync(id);
+            return Ok(new { message = "Plan deleted successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }

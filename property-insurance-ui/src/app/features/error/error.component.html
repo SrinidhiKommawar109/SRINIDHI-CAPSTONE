@@ -1,0 +1,13 @@
+<div class="error-container">
+  <div class="error-content">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h1 class="error-code">{{ errorCode }}</h1>
+    <h2 class="error-title">Oops! Something went wrong.</h2>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="btn btn-primary home-button" (click)="goHome()">
+      Back to Home
+    </button>
+  </div>
+</div>

@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Application.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Interfaces;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
+using Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +28,25 @@ public static class DependencyInjection
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection")));
 
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IAdminRepository, AdminRepository>();
+        services.AddScoped<IPolicyRequestRepository, PolicyRequestRepository>();
+        services.AddScoped<IClaimRepository, ClaimRepository>();
+        services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IPropertyPlanRepository, PropertyPlanRepository>();
+
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<JwtTokenGenerator>();
+        services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IPolicyRequestService, PolicyRequestService>();
+        services.AddScoped<IClaimsService, ClaimsService>();
+        services.AddScoped<IInvoiceService, InvoiceService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IPropertyPlanService, PropertyPlanService>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return services;
     }

@@ -47,6 +47,9 @@
                     <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">
                         {{ claim.policyRequest?.plan?.planName || 'Standard Policy' }}
                     </h3>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400">
+                        Assigned: {{ claim.assignedOfficer?.fullName || 'Auto-assigning...' }}
+                    </p>
                 </div>
                 <div class="text-right">
                     <p class="text-xs font-bold text-emerald-600">₹{{ claim.claimAmount | number: '1.2-2' }}</p>
@@ -71,6 +74,30 @@
                 <p class="text-xs text-slate-600 dark:text-slate-400 italic leading-relaxed">
                     {{ claim.propertyAddress }}
                 </p>
+            </div>
+
+            <!-- Photos Section -->
+            <div *ngIf="getPhotos(claim.photoUrls).length > 0"
+                class="py-4 space-y-2 border-t border-slate-100 dark:border-slate-800/50">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Attached Photos</p>
+                <div class="flex flex-wrap gap-2">
+                    <div *ngFor="let photo of getPhotos(claim.photoUrls)"
+                        class="relative h-16 w-16 overflow-hidden rounded-lg bg-slate-100 group">
+                        <img [src]="apiUrl + photo"
+                            class="h-full w-full object-cover transition-transform group-hover:scale-110"
+                            alt="Claim Photo" />
+                        <a [href]="apiUrl + photo" target="_blank"
+                            class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-white">
+                                <path d="M15 3h6v6" />
+                                <path d="M10 14 21 3" />
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <div class="pt-4 space-y-3">

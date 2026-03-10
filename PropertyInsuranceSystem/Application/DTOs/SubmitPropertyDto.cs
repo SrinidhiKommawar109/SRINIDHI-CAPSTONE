@@ -13,5 +13,7 @@ namespace Application.DTOs
         public decimal PropertyValue { get; set; }
 
         public int PropertyAge { get; set; }
+
+        public string? PropertyDetailsJson { get; set; }
     }
 }

@@ -1,10 +1,11 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +16,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -71,6 +70,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 
 // ✅ MOVE CORS HERE (before Build)
@@ -88,6 +89,16 @@ builder.Services.AddCors(options =>
 // 🔥 Build AFTER registering all services
 var app = builder.Build();
 
+app.UseExceptionHandler();
+
+// Ensure wwwroot exists for static files
+var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+if (!Directory.Exists(wwwrootPath))
+{
+    Directory.CreateDirectory(wwwrootPath);
+}
+
+app.UseStaticFiles();
 app.UseCors("AllowAngular");
 
 app.UseSwagger();

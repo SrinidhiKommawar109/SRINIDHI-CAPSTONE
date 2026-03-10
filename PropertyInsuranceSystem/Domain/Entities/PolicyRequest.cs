@@ -23,6 +23,8 @@ namespace Domain.Entities
         public decimal? PropertyValue { get; set; }
         public int? PropertyAge { get; set; }
         public decimal? RiskScore { get; set; }
+        public string? FormType { get; set; }
+        public string? PropertyDetailsJson { get; set; }
 
         public decimal PremiumAmount { get; set; }
         public decimal TotalPremium { get; set; }
@@ -34,5 +36,7 @@ namespace Domain.Entities
         public int InstallmentCount { get; set; }
         public decimal AgentCommissionAmount { get; set; }
         public string? AdminNotes { get; set; }
+
+        public virtual ICollection<Claim> Claims { get; set; } = new List<Claim>();
     }
 }

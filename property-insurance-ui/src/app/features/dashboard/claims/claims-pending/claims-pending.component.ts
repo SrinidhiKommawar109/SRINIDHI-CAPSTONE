@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClaimsService, Claim } from '../../../../core/claims.service';
 import { NotificationsService } from '../../../../core/notifications.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-claims-pending',
@@ -19,9 +20,15 @@ export class ClaimsPendingComponent implements OnInit {
     claimRemarks: Record<number, string> = {};
     loading = false;
     errorMessage = '';
+    readonly apiUrl = environment.apiBaseUrl.replace('/api', '');
 
     ngOnInit(): void {
         this.loadPending();
+    }
+
+    getPhotos(urls: string | undefined): string[] {
+        if (!urls) return [];
+        return urls.split(',').filter(u => !!u);
     }
 
     loadPending(): void {

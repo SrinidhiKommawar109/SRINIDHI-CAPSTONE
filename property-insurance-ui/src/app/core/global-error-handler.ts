@@ -11,9 +11,10 @@ export class GlobalErrorHandler implements ErrorHandler {
         // Log error to console for debugging
         console.error('Global Error Handler:', error);
 
-        // Navigate to /not-found within NgZone
+        // Navigate to /error within NgZone
         this.zone.run(() => {
-            router.navigate(['/not-found']);
+            const errorMessage = error.message || error.toString();
+            router.navigate(['/error'], { state: { error: errorMessage, status: error.status || 500 } });
         });
     }
 }

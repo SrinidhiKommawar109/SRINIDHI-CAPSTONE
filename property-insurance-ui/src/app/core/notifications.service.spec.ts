@@ -4,6 +4,7 @@ import { NotificationsService, NotificationMessage } from './notifications.servi
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 import { of } from 'rxjs';
+import { vi } from 'vitest';
 
 describe('NotificationsService', () => {
     let service: NotificationsService;
@@ -11,9 +12,10 @@ describe('NotificationsService', () => {
     let authServiceSpy: any;
 
     beforeEach(() => {
-        authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn'], {
+        authServiceSpy = {
+            isLoggedIn: vi.fn(),
             authState$: of(false)
-        });
+        };
 
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
@@ -51,21 +53,24 @@ describe('NotificationsService', () => {
         req.flush(dummyNotifications);
     });
 
-    it('should locally show a new notification', (done) => {
+    it('should locally show a new notification', async () => {
         const testMsg = { title: 'Local Title', message: 'Local Msg', type: 'info' as const };
 
-        service.messages$.subscribe(msgs => {
-            if (msgs.length > 0) {
-                expect(msgs[0].title).toBe('Local Title');
-                expect(msgs[0].message).toBe('Local Msg');
-                (done as any)();
-            }
+        const promise = new Promise<void>(resolve => {
+            service.messages$.subscribe(msgs => {
+                if (msgs.length > 0) {
+                    expect(msgs[0].title).toBe('Local Title');
+                    expect(msgs[0].message).toBe('Local Msg');
+                    resolve();
+                }
+            });
         });
 
         service.show(testMsg);
+        await promise;
     });
 
-    it('should calculate unread count correctly', (done) => {
+    it('should calculate unread count correctly', async () => {
         const dummyNotifications: NotificationMessage[] = [
             { id: 1, title: 'T1', message: 'M1', type: 'info', isRead: false, createdAt: '' },
             { id: 2, title: 'T2', message: 'M2', type: 'info', isRead: true, createdAt: '' }
@@ -74,9 +79,13 @@ describe('NotificationsService', () => {
         // Manually trigger subject for local test
         (service as any).messagesSubject.next(dummyNotifications);
 
-        service.unreadCount$.subscribe(count => {
-            expect(count).toBe(1);
-            (done as any)();
+        const promise = new Promise<void>(resolve => {
+            service.unreadCount$.subscribe(count => {
+                expect(count).toBe(1);
+                resolve();
+            });
         });
+
+        await promise;
     });
 });

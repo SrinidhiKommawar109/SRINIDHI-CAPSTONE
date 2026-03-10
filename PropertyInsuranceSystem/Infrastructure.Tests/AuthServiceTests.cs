@@ -1,8 +1,11 @@
 using Application.DTOs;
+using Application.Services;
+using Application.Interfaces;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
+using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -38,7 +41,8 @@ namespace Infrastructure.Tests.Services
             // Arrange
             var context = GetContext();
             var generator = GetTokenGenerator();
-            var service = new AuthService(context, generator);
+            IRepository<ApplicationUser> userRepository = new Repository<ApplicationUser>(context);
+            var service = new AuthService(userRepository, generator);
             var request = new RegisterRequestDto
             {
                 Email = "newuser@example.com",
@@ -64,7 +68,8 @@ namespace Infrastructure.Tests.Services
             // Arrange
             var context = GetContext();
             var generator = GetTokenGenerator();
-            var service = new AuthService(context, generator);
+            IRepository<ApplicationUser> userRepository = new Repository<ApplicationUser>(context);
+            var service = new AuthService(userRepository, generator);
             var email = "test@example.com";
             var password = "Password123";
             var user = new ApplicationUser
@@ -93,7 +98,8 @@ namespace Infrastructure.Tests.Services
             // Arrange
             var context = GetContext();
             var generator = GetTokenGenerator();
-            var service = new AuthService(context, generator);
+            IRepository<ApplicationUser> userRepository = new Repository<ApplicationUser>(context);
+            var service = new AuthService(userRepository, generator);
             var email = "test@example.com";
             var user = new ApplicationUser
             {

@@ -88,6 +88,21 @@ export class AdminManagePlansComponent implements OnInit {
         });
     }
 
+    deletePlan(id: number): void {
+        if (!confirm('Are you sure you want to delete this plan?')) return;
+        this.adminService.deletePlan(id).subscribe({
+            next: () => {
+                this.notifications.show({ title: 'Plan Deleted', message: 'The insurance plan has been removed.', type: 'success' });
+                this.loadCategories();
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                this.error = err?.error?.title || 'Failed to delete plan.';
+                this.cdr.detectChanges();
+            },
+        });
+    }
+
     getFrequencyLabel(freq: string | number): string {
         if (typeof freq === 'number') {
             switch (freq) {

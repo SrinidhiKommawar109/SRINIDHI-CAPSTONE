@@ -1,8 +1,9 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NotificationsComponent } from './notifications.component';
 import { NotificationsService, NotificationMessage } from '../core/notifications.service';
 import { BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { vi } from 'vitest';
 
 describe('NotificationsComponent', () => {
     let component: NotificationsComponent;
@@ -12,9 +13,11 @@ describe('NotificationsComponent', () => {
 
     beforeEach(async () => {
         messagesSubject = new BehaviorSubject<NotificationMessage[]>([]);
-        notificationsServiceSpy = jasmine.createSpyObj('NotificationsService', ['show', 'markAsRead'], {
+        notificationsServiceSpy = {
+            show: vi.fn(),
+            markAsRead: vi.fn(),
             messages$: messagesSubject.asObservable()
-        });
+        };
 
         await TestBed.configureTestingModule({
             imports: [NotificationsComponent, CommonModule],
@@ -25,14 +28,16 @@ describe('NotificationsComponent', () => {
 
         fixture = TestBed.createComponent(NotificationsComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        fixture.autoDetectChanges(true); // Automatically handle change detection and prevent NG0100
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should show new messages and auto-remove them', fakeAsync(() => {
+    it('should show new messages and auto-remove them', () => {
+        vi.useFakeTimers();
+
         const newMessage: NotificationMessage = {
             id: 1,
             title: 'Test',
@@ -43,14 +48,16 @@ describe('NotificationsComponent', () => {
         };
 
         messagesSubject.next([newMessage]);
-        fixture.detectChanges();
+        // fixture.detectChanges(); // Change detection is now automatic
 
         expect(component.transientMessages.length).toBe(1);
         expect(component.transientMessages[0].id).toBe(1);
 
-        tick(5001); // Wait for auto-remove
+        vi.advanceTimersByTime(5001); // Wait for auto-remove
         expect(component.transientMessages.length).toBe(0);
-    }));
+
+        vi.useRealTimers();
+    });
 
     it('should remove message manually', () => {
         const msg: NotificationMessage = { id: 1, title: 'T', message: 'M', type: 'info', isRead: false, createdAt: '' };

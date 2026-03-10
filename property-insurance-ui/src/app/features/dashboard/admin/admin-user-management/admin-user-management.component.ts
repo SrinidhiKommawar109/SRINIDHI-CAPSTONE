@@ -18,6 +18,17 @@ export class AdminUserManagementComponent implements OnInit {
     staff: any[] = [];
     showAddUserForm = false;
     error = '';
+    searchTerm = '';
+
+    get filteredStaff(): any[] {
+        if (!this.searchTerm.trim()) return this.staff;
+        const lowSearch = this.searchTerm.toLowerCase();
+        return this.staff.filter(user =>
+            user.fullName?.toLowerCase().includes(lowSearch) ||
+            user.email?.toLowerCase().includes(lowSearch) ||
+            user.role?.toLowerCase().includes(lowSearch)
+        );
+    }
 
     newUser = {
         fullName: '',

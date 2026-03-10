@@ -1,172 +1,648 @@
-<div class="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
-    <!-- Requests List -->
-    <div
-        class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-800">
-        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">My Policy Requests</h2>
-            <button type="button"
-                class="text-xs font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1 dark:text-slate-400 dark:hover:text-slate-100"
-                (click)="loadMyRequests()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                    <path d="M3 3v5h5" />
-                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-                    <path d="M16 16h5v5" />
-                </svg>
-                Refresh
-            </button>
-        </div>
-        <div class="p-0">
-            <div *ngIf="requestsLoading" class="p-6 text-center text-sm text-slate-500">Loading requests...</div>
-            <div *ngIf="!requestsLoading && myRequests.length === 0" class="p-12 text-center">
-                <div
-                    class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3 dark:bg-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                        <polyline points="14 2 14 8 20 8" />
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto pb-12">
+    <!-- Progress Stepper -->
+    <div class="mb-12">
+        <div class="relative flex items-center justify-between">
+            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 dark:bg-slate-800"></div>
+            <div class="absolute top-1/2 left-0 h-0.5 bg-emerald-500 -translate-y-1/2 transition-all duration-500"
+                [style.width.%]="(currentStep - 1) * 33.33"></div>
+
+            <!-- Step 1 -->
+            <button (click)="goToStep(1)" [disabled]="currentStep < 1"
+                class="relative z-10 flex flex-col items-center group">
+                <div class="h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2"
+                    [ngClass]="currentStep >= 1 ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-400 dark:bg-slate-900 dark:border-slate-800'">
+                    <span *ngIf="currentStep <= 1" class="font-bold text-sm">1</span>
+                    <svg *ngIf="currentStep > 1" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                 </div>
-                <p class="text-sm text-slate-500">No requests found.</p>
+                <span class="absolute -bottom-7 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+                    [ngClass]="currentStep >= 1 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">Select
+                    Policy</span>
+            </button>
+
+            <!-- Step 2 -->
+            <button (click)="goToStep(2)" [disabled]="currentStep < 2"
+                class="relative z-10 flex flex-col items-center group">
+                <div class="h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2"
+                    [ngClass]="currentStep >= 2 ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-400 dark:bg-slate-900 dark:border-slate-800'">
+                    <span *ngIf="currentStep <= 2" class="font-bold text-sm">2</span>
+                    <svg *ngIf="currentStep > 2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <span class="absolute -bottom-7 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+                    [ngClass]="currentStep >= 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">Property
+                    Details</span>
+            </button>
+
+            <!-- Step 3 -->
+            <button (click)="goToStep(3)" [disabled]="currentStep < 3"
+                class="relative z-10 flex flex-col items-center group">
+                <div class="h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2"
+                    [ngClass]="currentStep >= 3 ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-400 dark:bg-slate-900 dark:border-slate-800'">
+                    <span *ngIf="currentStep <= 3" class="font-bold text-sm">3</span>
+                    <svg *ngIf="currentStep > 3" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <span class="absolute -bottom-7 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+                    [ngClass]="currentStep >= 3 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">Review
+                    Quote</span>
+            </button>
+
+            <!-- Step 4 -->
+            <button (click)="goToStep(4)" [disabled]="currentStep < 4"
+                class="relative z-10 flex flex-col items-center group">
+                <div class="h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2"
+                    [ngClass]="currentStep >= 4 ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-400 dark:bg-slate-900 dark:border-slate-800'">
+                    <span class="font-bold text-sm">4</span>
+                </div>
+                <span class="absolute -bottom-7 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+                    [ngClass]="currentStep >= 4 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">Payment</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 1: Select Request -->
+    <div *ngIf="currentStep === 1" class="animate-in fade-in zoom-in duration-300">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <h3 class="text-xl font-bold text-slate-900 mb-2 dark:text-slate-100">Select Your Policy Request</h3>
+            <p class="text-sm text-slate-500 mb-8">Enter the Request ID assigned to you to begin the property detail
+                submission.</p>
+
+            <div class="max-w-md">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Enter Policy
+                    Request ID</label>
+                <div class="flex gap-3">
+                    <input type="number" min="1"
+                        class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        placeholder="e.g. 101" [(ngModel)]="activeRequestId" />
+                    <button (click)="goToNextStep()"
+                        class="px-8 rounded-xl bg-emerald-600 text-sm font-bold text-white hover:bg-emerald-500 transition-all shadow-sm">
+                        Confirm & Next
+                    </button>
+                </div>
+                <p *ngIf="submitMessage" class="mt-4 text-xs font-semibold text-rose-500">{{ submitMessage }}</p>
             </div>
-            <div class="overflow-x-auto" *ngIf="myRequests.length > 0">
-                <table class="w-full text-left text-sm">
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                        <tr *ngFor="let req of myRequests"
-                            class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">#{{ req.id }}</td>
-                            <td class="px-6 py-4">
-                                <div class="text-slate-700 dark:text-slate-300">{{ req.plan?.planName || ('Plan ' +
-                                    req.planId) }}</div>
-                                <div *ngIf="req.totalPremium" class="text-[10px] text-emerald-600 font-semibold">
-                                    ₹{{ req.totalPremium | number: '1.2-2' }} (Calculated)
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-xs">
-                                <div *ngIf="req.installmentAmount" class="text-slate-600 dark:text-slate-400">
-                                    {{ req.installmentCount }} × ₹{{ req.installmentAmount | number: '1.2-2' }}
-                                </div>
-                                <div *ngIf="!req.installmentAmount" class="text-slate-400 italic">Pending...</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium"
-                                    [ngClass]="{
-                                        'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': req.status === 'PendingAdmin',
-                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': req.status === 'AgentAssigned',
-                                        'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400': req.status === 'RiskCalculated',
-                                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': req.status === 'PolicyApproved'
-                                    }">
-                                    {{ req.status }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <!-- Mini List -->
+            <div class="mt-12 border-t border-slate-100 pt-8 dark:border-slate-800">
+                <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Your Recent Requests</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div *ngFor="let req of myRequests.slice(0, 4)" (click)="activeRequestId = req.id"
+                        [ngClass]="activeRequestId == req.id ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-slate-100 hover:border-emerald-200 dark:border-slate-800'"
+                        class="cursor-pointer rounded-xl border p-4 transition-all">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-bold text-slate-900 dark:text-slate-100">#{{ req.id }}</span>
+                            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full" [ngClass]="{
+                                    'bg-amber-100 text-amber-700': req.status === 'PendingAdmin',
+                                    'bg-blue-100 text-blue-700': req.status === 'AgentAssigned',
+                                    'bg-purple-100 text-purple-700': req.status === 'FormSubmitted',
+                                    'bg-sky-100 text-sky-700': req.status === 'RiskCalculated'
+                                }">{{ req.status }}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 truncate">{{ req.plan?.planName }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Submit + Buy Grid -->
-    <div class="grid gap-8 md:grid-cols-2">
-        <!-- Submit Details -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm dark:bg-slate-900 dark:border-slate-800">
-            <h3 class="text-sm font-semibold text-slate-900 mb-4 dark:text-slate-100">Submit Property Details</h3>
-            <div class="space-y-4">
+    <!-- Step 2: Property Details -->
+    <div *ngIf="currentStep === 2" class="animate-in fade-in slide-in-from-right-4 duration-300">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Policy
-                        Request ID</label>
-                    <input type="number" min="1"
-                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
-                        placeholder="e.g. 101" [(ngModel)]="submitRequestId" />
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">Property Details</h3>
+                    <p class="text-sm text-slate-500 mt-1">Provide specific information for Request #{{ activeRequestId
+                        }}</p>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Property
-                        Address</label>
-                    <input type="text"
-                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
-                        placeholder="Full address" [(ngModel)]="submitPayload.propertyAddress" />
+                <div
+                    class="rounded-full bg-sky-100 px-4 py-1.5 text-[10px] font-bold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+                    {{ selectedFormType }} Property Form
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+            </div>
+
+            <div *ngIf="!selectedFormType" class="p-12 text-center text-slate-500 italic">
+                Form type not assigned by agent yet.
+            </div>
+
+            <div *ngIf="selectedFormType" class="space-y-6">
+                <!-- Basic Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
+                    <div class="md:col-span-2">
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
+                            Address</label>
+                        <textarea rows="2" [(ngModel)]="submitPayload.propertyAddress"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700"
+                            placeholder="Full physical address..."></textarea>
+                    </div>
+                    <div *ngIf="selectedFormType !== 'Contents'">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Market
+                            Value (₹)</label>
+                        <input type="number" [(ngModel)]="submitPayload.propertyValue"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div *ngIf="selectedFormType !== 'Contents'">
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Construction
+                            Age (Years)</label>
+                        <input type="number" [(ngModel)]="submitPayload.propertyAge"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                </div>
+
+                <!-- Residential Form -->
+                <div *ngIf="selectedFormType === 'Residential'"
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                     <div>
                         <label
-                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Property
-                            Value</label>
-                        <input type="number"
-                            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
-                            placeholder="₹" [(ngModel)]="submitPayload.propertyValue" />
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
+                            Type</label>
+                        <select [(ngModel)]="residentialForm.propertyType"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Villa">Villa</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Age
-                            (Years)</label>
-                        <input type="number"
-                            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
-                            placeholder="Years" [(ngModel)]="submitPayload.propertyAge" />
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Built-up
+                            Area (Sq Ft)</label>
+                        <input type="number" [(ngModel)]="residentialForm.builtUpArea"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Number
+                            of Floors</label>
+                        <input type="number" [(ngModel)]="residentialForm.numberOfFloors"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Security
+                            System</label>
+                        <select [(ngModel)]="residentialForm.securitySystemAvailable"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Fire
+                            Safety</label>
+                        <select [(ngModel)]="residentialForm.fireSafetyEquipment"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Flood
+                            Zone</label>
+                        <select [(ngModel)]="residentialForm.floodZone"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
                 </div>
-                <button (click)="submitProperty()"
-                    class="w-full rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500 transition-all">
-                    Submit Property Info
-                </button>
-                <div *ngIf="submitMessage" class="text-xs text-emerald-600 dark:text-emerald-400">{{ submitMessage }}
+
+                <!-- Commercial Form -->
+                <div *ngIf="selectedFormType === 'Commercial'"
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Business
+                            Type</label>
+                        <input type="text" [(ngModel)]="commercialForm.businessType"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Employees
+                            #</label>
+                        <input type="number" [(ngModel)]="commercialForm.numberOfEmployees"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">CCTV
+                            Available</label>
+                        <select [(ngModel)]="commercialForm.securitySystemCCTV"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Industrial Form -->
+                <div *ngIf="selectedFormType === 'Industrial'"
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Industry
+                            Type</label>
+                        <input type="text" [(ngModel)]="industrialForm.industryType"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Machinery
+                            Value (₹)</label>
+                        <input type="number" [(ngModel)]="industrialForm.machineryValue"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Hazardous
+                            Storage</label>
+                        <select [(ngModel)]="industrialForm.hazardousMaterialStorage"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Contents Form -->
+                <div *ngIf="selectedFormType === 'Contents'"
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Content
+                            Type</label>
+                        <input type="text" [(ngModel)]="contentsForm.contentType"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Total
+                            Value (₹)</label>
+                        <input type="number" [(ngModel)]="contentsForm.totalContentValue"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Theft
+                            Protection</label>
+                        <select [(ngModel)]="contentsForm.theftProtection"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Form Submit Action -->
+                <div class="pt-8 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                    <button (click)="goToStep(1)"
+                        class="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">Back to
+                        Select</button>
+                    <div class="flex gap-4">
+                        <button (click)="submitProperty()"
+                            [disabled]="selectedRequest?.status === 'FormSubmitted' || selectedRequest?.status === 'RiskCalculated'"
+                            class="px-8 py-3 rounded-xl bg-emerald-600 text-sm font-bold text-white hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50">
+                            {{ selectedRequest?.status === 'FormSubmitted' || selectedRequest?.status ===
+                            'RiskCalculated' ? 'Details Submitted' : 'Submit for Review' }}
+                        </button>
+                        <button *ngIf="selectedRequest?.status === 'RiskCalculated'" (click)="goToNextStep()"
+                            class="px-8 py-3 rounded-xl bg-sky-600 text-sm font-bold text-white hover:bg-sky-500 transition-all shadow-lg shadow-sky-500/20">
+                            Review Quote &raquo;
+                        </button>
+                    </div>
+                </div>
+                <p *ngIf="submitMessage" class="mt-4 text-center text-xs font-bold text-emerald-600">{{ submitMessage }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Review Quote -->
+    <div *ngIf="currentStep === 3" class="animate-in fade-in slide-in-from-right-4 duration-300">
+        <div
+            class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <div class="p-8 bg-sky-600 text-white">
+                <h3 class="text-2xl font-bold mb-2">Policy Quote Generated</h3>
+                <p class="text-sky-100 text-sm">Review your calculated premium and coverage details.</p>
+            </div>
+
+            <div class="p-8 lg:p-12">
+                <!-- Quote Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Risk
+                            Factor</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-4xl font-black text-slate-900 dark:text-white">{{
+                                selectedRequest?.riskScore }}</span>
+                            <span
+                                class="text-[10px] font-bold px-2 py-1 rounded bg-emerald-100 text-emerald-700 uppercase"
+                                [ngClass]="(selectedRequest?.riskScore || 0) > 10 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'">
+                                {{ (selectedRequest?.riskScore || 0) > 10 ? 'Moderate Risk' : 'Low Risk' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Annual
+                            Premium</label>
+                        <span class="text-4xl font-black text-emerald-600">₹{{ selectedRequest?.totalPremium | number:
+                            '1.2-2' }}</span>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Payment
+                            Mode</label>
+                        <span class="text-2xl font-bold text-slate-700 dark:text-slate-300">{{ selectedFrequency
+                            }}</span>
+                        <p class="text-[10px] text-slate-500 font-medium">₹{{ installmentAmount | number:'1.2-2' }} x {{
+                            installmentCount }}
+                            installments</p>
+                    </div>
+                </div>
+
+                <!-- Frequency Selection -->
+                <div class="mb-12">
+                    <label
+                        class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 block text-center">Select
+                        Payment Frequency</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div (click)="selectFrequency('Yearly')"
+                            [ngClass]="selectedFrequency === 'Yearly' ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10 ring-2 ring-emerald-500/20' : 'border-slate-100 dark:border-slate-800'"
+                            class="cursor-pointer rounded-2xl border p-5 transition-all hover:border-emerald-200 group text-center">
+                            <h5 class="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600">
+                                Yearly</h5>
+                            <p class="text-[10px] text-slate-500 mb-2">1 Full Payment</p>
+                            <p class="text-sm font-bold text-emerald-600">₹{{ (selectedRequest?.totalPremium || 0) |
+                                number:'1.2-2' }}</p>
+                        </div>
+                        <div (click)="selectFrequency('Half-Yearly')"
+                            [ngClass]="selectedFrequency === 'Half-Yearly' ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10 ring-2 ring-emerald-500/20' : 'border-slate-100 dark:border-slate-800'"
+                            class="cursor-pointer rounded-2xl border p-5 transition-all hover:border-emerald-200 group text-center">
+                            <h5 class="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600">
+                                Half-Yearly</h5>
+                            <p class="text-[10px] text-slate-500 mb-2">2 Installments</p>
+                            <p class="text-sm font-bold text-emerald-600">₹{{ ((selectedRequest?.totalPremium || 0) / 2)
+                                | number:'1.2-2' }}</p>
+                        </div>
+                        <div (click)="selectFrequency('Quarterly')"
+                            [ngClass]="selectedFrequency === 'Quarterly' ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10 ring-2 ring-emerald-500/20' : 'border-slate-100 dark:border-slate-800'"
+                            class="cursor-pointer rounded-2xl border p-5 transition-all hover:border-emerald-200 group text-center">
+                            <h5 class="font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600">
+                                Quarterly</h5>
+                            <p class="text-[10px] text-slate-500 mb-2">4 Installments</p>
+                            <p class="text-sm font-bold text-emerald-600">₹{{ ((selectedRequest?.totalPremium || 0) / 4)
+                                | number:'1.2-2' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Timeline -->
+                <div class="mb-12">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">Payment Timeline</h4>
+                    <div
+                        class="relative pl-8 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+                        <div *ngFor="let item of paymentSchedule; let i = index" class="relative group">
+                            <div
+                                class="absolute -left-8 top-1.5 h-6 w-6 rounded-full border-4 border-white dark:border-slate-900 bg-emerald-500 z-10">
+                            </div>
+                            <div
+                                class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800 transition-all group-hover:shadow-md">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                                            Payment #{{i + 1}}</p>
+                                        <h6 class="text-sm font-bold text-slate-900 dark:text-white">{{ item.date |
+                                            date:'longDate' }}</h6>
+                                    </div>
+                                    <span class="text-lg font-black text-slate-900 dark:text-white">₹{{ item.amount |
+                                        number:'1.2-2' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forms based on the category -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 border-y border-slate-100 dark:border-slate-800 mb-12">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Property Selection
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-500">Address</span>
+                                <span
+                                    class="font-semibold text-slate-900 dark:text-white text-right max-w-[200px] truncate">{{
+                                    selectedRequest?.propertyAddress }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm" *ngIf="selectedRequest?.propertyValue">
+                                <span class="text-slate-500">Market Value</span>
+                                <span class="font-semibold text-slate-900 dark:text-white">₹{{
+                                    selectedRequest?.propertyValue | number }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm" *ngIf="selectedRequest?.propertyAge">
+                                <span class="text-slate-500">Construction Age</span>
+                                <span class="font-semibold text-slate-900 dark:text-white">{{
+                                    selectedRequest?.propertyAge }} Years</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">{{ selectedFormType
+                            }} Features</h4>
+                        <div class="space-y-3">
+                            <!-- Residential specific -->
+                            <ng-container *ngIf="selectedFormType === 'Residential'">
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">Type</span><span
+                                        class="font-semibold dark:text-white">{{ residentialForm.propertyType }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm"><span
+                                        class="text-slate-500">Floors</span><span
+                                        class="font-semibold dark:text-white">{{ residentialForm.numberOfFloors
+                                        }}</span></div>
+                                <div class="flex justify-between text-sm"><span
+                                        class="text-slate-500">Security</span><span
+                                        class="font-semibold dark:text-white">{{ residentialForm.securitySystemAvailable
+                                        }}</span></div>
+                            </ng-container>
+                            <!-- Commercial specific -->
+                            <ng-container *ngIf="selectedFormType === 'Commercial'">
+                                <div class="flex justify-between text-sm"><span
+                                        class="text-slate-500">Business</span><span
+                                        class="font-semibold dark:text-white">{{ commercialForm.businessType }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">Staff</span><span
+                                        class="font-semibold dark:text-white">{{ commercialForm.numberOfEmployees
+                                        }}</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">CCTV</span><span
+                                        class="font-semibold dark:text-white">{{ commercialForm.securitySystemCCTV
+                                        }}</span></div>
+                            </ng-container>
+                            <!-- Industrial specific -->
+                            <ng-container *ngIf="selectedFormType === 'Industrial'">
+                                <div class="flex justify-between text-sm"><span
+                                        class="text-slate-500">Industry</span><span
+                                        class="font-semibold dark:text-white">{{ industrialForm.industryType }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm"><span
+                                        class="text-slate-500">Machinery</span><span
+                                        class="font-semibold dark:text-white">₹{{ industrialForm.machineryValue | number
+                                        }}</span></div>
+                            </ng-container>
+                            <!-- Contents specific -->
+                            <ng-container *ngIf="selectedFormType === 'Contents'">
+                                <div class="flex justify-between text-sm"><span
+                                        class="text-slate-500">Contents</span><span
+                                        class="font-semibold dark:text-white">{{ contentsForm.contentType }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">Value</span><span
+                                        class="font-semibold dark:text-white">₹{{ contentsForm.totalContentValue |
+                                        number }}</span></div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex items-center justify-between">
+                    <button (click)="goToStep(2)"
+                        class="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        Edit Details
+                    </button>
+                    <button (click)="goToNextStep()"
+                        class="px-12 py-4 rounded-2xl bg-emerald-600 text-sm font-bold text-white hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-500/20">
+                        Proceed to Payment &rarr;
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Finalize Purchase -->
-        <div
-            class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm dark:bg-slate-900 dark:border-slate-800 relative">
-            <h3 class="text-sm font-semibold text-slate-900 mb-4 dark:text-slate-100">Finalize Purchase</h3>
-            <p class="text-xs text-slate-500 mb-6 dark:text-slate-400">Once your request is approved, confirm to
-                activate your policy.</p>
+    <!-- Step 4: Payment -->
+    <div *ngIf="currentStep === 4" class="animate-in fade-in zoom-in duration-300">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+            <h3 class="text-xl font-bold text-slate-900 mb-8 dark:text-slate-100">Secure Checkout</h3>
 
-            <div *ngIf="!showPaymentForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Left: Payment Methods -->
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 block">Approved
-                        Request ID</label>
-                    <input type="number" min="1"
-                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
-                        placeholder="e.g. 101" [(ngModel)]="buyRequestId" />
+                    <div class="flex gap-4 border-b border-slate-100 dark:border-slate-800 mb-8 overflow-x-auto">
+                        <button (click)="setPaymentTab('card')"
+                            [ngClass]="paymentTab === 'card' ? 'border-b-2 border-emerald-500 text-emerald-600' : 'text-slate-400'"
+                            class="pb-4 px-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap">Credit/Debit
+                            Card</button>
+                        <button (click)="setPaymentTab('upi')"
+                            [ngClass]="paymentTab === 'upi' ? 'border-b-2 border-emerald-500 text-emerald-600' : 'text-slate-400'"
+                            class="pb-4 px-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap">UPI /
+                            PhonePe</button>
+                        <button (click)="setPaymentTab('netbanking')"
+                            [ngClass]="paymentTab === 'netbanking' ? 'border-b-2 border-emerald-500 text-emerald-600' : 'text-slate-400'"
+                            class="pb-4 px-2 text-xs font-bold uppercase tracking-wider whitespace-nowrap">Net
+                            Banking</button>
+                    </div>
+
+                    <div *ngIf="paymentTab === 'card'" class="space-y-4 animate-in fade-in duration-300">
+                        <input type="text" [(ngModel)]="paymentInfo.cardNumber"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700"
+                            placeholder="Card Number" />
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" [(ngModel)]="paymentInfo.expiry"
+                                class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700"
+                                placeholder="MM/YY" />
+                            <input type="password" [(ngModel)]="paymentInfo.cvv"
+                                class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700"
+                                placeholder="CVV" />
+                        </div>
+                    </div>
+
+                    <div *ngIf="paymentTab === 'upi'" class="space-y-4 animate-in fade-in duration-300">
+                        <input type="text" [(ngModel)]="paymentInfo.upiId"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700"
+                            placeholder="user@upi" />
+                    </div>
+
+                    <div *ngIf="paymentTab === 'netbanking'" class="space-y-4 animate-in fade-in duration-300">
+                        <select [(ngModel)]="paymentInfo.bankName"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:bg-slate-800 dark:border-slate-700">
+                            <option value="">Select Bank</option>
+                            <option value="sbi">SBI</option>
+                            <option value="hdfc">HDFC</option>
+                            <option value="icici">ICICI</option>
+                        </select>
+                    </div>
+
+                    <p *ngIf="paymentError" class="mt-4 text-xs font-bold text-rose-500 bg-rose-50 p-3 rounded-lg">{{
+                        paymentError }}</p>
+
+                    <div class="mt-12 flex gap-4">
+                        <button (click)="goToStep(3)"
+                            class="flex-1 px-8 py-4 rounded-2xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50">Back</button>
+                        <button (click)="confirmPurchase()"
+                            class="flex-[2] px-8 py-4 rounded-2xl bg-emerald-600 text-sm font-bold text-white hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-500/20">
+                            Confirm & Pay ₹{{ finalTotal | number: '1.2-2' }}
+                        </button>
+                    </div>
                 </div>
-                <button (click)="initiateCheckout()"
-                    class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-all">
-                    Proceed to Payment
-                </button>
-                <div *ngIf="buyMessage" class="text-xs text-emerald-600 dark:text-emerald-400">{{ buyMessage }}</div>
+
+                <!-- Right: Order Summary -->
+                <div class="lg:pl-12 lg:border-l border-slate-100 dark:border-slate-800">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">Order Summary</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-500">Premium ({{selectedFrequency}})</span>
+                            <span class="font-bold text-slate-900 dark:text-white">₹{{ installmentAmount |
+                                number: '1.2-2' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-500">Handling Charges</span>
+                            <span class="font-bold text-emerald-600">FREE</span>
+                        </div>
+
+                        <!-- Wallet Usage Option -->
+                        <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center justify-between group cursor-pointer"
+                                (click)="useWallet = !useWallet">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" [(ngModel)]="useWallet" (click)="$event.stopPropagation()"
+                                        class="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Use Wallet
+                                        Amount (40%)</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-400">Bal: ₹{{walletBalance}}</span>
+                            </div>
+                            <div *ngIf="useWallet"
+                                class="mt-2 flex justify-between text-xs animate-in slide-in-from-top-1 duration-200">
+                                <span class="text-emerald-600 font-medium">Wallet Discount</span>
+                                <span class="text-emerald-600 font-bold">-₹{{ walletDiscount | number: '1.2-2' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">Total Amount</span>
+                            <span class="text-xl font-black text-emerald-600">₹{{ finalTotal | number: '1.2-2' }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="mt-8 p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 dark:bg-slate-800/50 dark:border-slate-700 text-[10px] text-slate-500">
+                        By confirming, you agree to the PropShield Terms of Service and Privacy Policy. Your data is
+                        encrypted and secure.
+                    </div>
+                </div>
             </div>
 
-            <!-- Dummy Payment Overlay -->
-            <div *ngIf="showPaymentForm"
-                class="absolute inset-0 z-10 bg-white/95 backdrop-blur-sm p-6 rounded-2xl dark:bg-slate-900/95 animate-in fade-in duration-300">
-                <h4 class="text-xs font-bold uppercase text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="20" height="14" x="2" y="5" rx="2" />
-                        <line x1="2" y1="10" x2="22" y2="10" />
-                    </svg>
-                    Secure Checkout
-                </h4>
-                <div class="space-y-3">
-                    <input type="text"
-                        class="w-full rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800 dark:border-slate-700"
-                        placeholder="Card Number (XXXX-XXXX-XXXX-XXXX)" />
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text"
-                            class="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800 dark:border-slate-700"
-                            placeholder="MM/YY" />
-                        <input type="text"
-                            class="rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800 dark:border-slate-700"
-                            placeholder="CVV" />
-                    </div>
-                    <div class="pt-2 flex gap-2">
-                        <button (click)="showPaymentForm = false"
-                            class="flex-1 rounded border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400">Cancel</button>
-                        <button (click)="confirmPurchase()"
-                            class="flex-1 rounded bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 dark:bg-slate-50 dark:text-slate-950">Pay
-                            Now</button>
-                    </div>
-                </div>
-            </div>
+            <p *ngIf="buyMessage"
+                class="mt-8 text-center text-xs font-bold text-emerald-600 bg-emerald-50 p-4 rounded-xl">{{ buyMessage
+                }}</p>
         </div>
     </div>
 </div>

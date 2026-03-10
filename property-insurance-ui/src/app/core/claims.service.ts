@@ -21,6 +21,12 @@ export interface Claim {
   claimAmount: number;
   status: string;
   remarks?: string;
+  assignedOfficerId?: number;
+  assignedOfficer?: {
+    fullName: string;
+    email: string;
+  };
+  photoUrls?: string;
 }
 
 export interface VerifyClaimPayload {
@@ -33,6 +39,8 @@ export interface CreateClaimPayload {
   propertyAddress: string;
   propertyValue: number;
   propertyAge: number;
+  claimAmount: number;
+  photos?: File[];
 }
 
 @Injectable({
@@ -51,7 +59,20 @@ export class ClaimsService {
   }
 
   createClaim(payload: CreateClaimPayload): Observable<string> {
-    return this.http.post(this.baseUrl, payload, {
+    const formData = new FormData();
+    formData.append('policyRequestId', payload.policyRequestId.toString());
+    formData.append('propertyAddress', payload.propertyAddress);
+    formData.append('propertyValue', payload.propertyValue.toString());
+    formData.append('propertyAge', payload.propertyAge.toString());
+    formData.append('claimAmount', payload.claimAmount.toString());
+
+    if (payload.photos) {
+      payload.photos.forEach(file => {
+        formData.append('photos', file, file.name);
+      });
+    }
+
+    return this.http.post(this.baseUrl, formData, {
       responseType: 'text',
     }) as Observable<string>;
   }

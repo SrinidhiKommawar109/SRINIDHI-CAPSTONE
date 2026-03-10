@@ -3,6 +3,7 @@ import { ClaimsDashboardComponent } from './claims-dashboard.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('ClaimsDashboardComponent', () => {
     let component: ClaimsDashboardComponent;
@@ -15,6 +16,7 @@ describe('ClaimsDashboardComponent', () => {
                 HttpClientTestingModule,
                 FormsModule,
                 CommonModule,
+                RouterTestingModule,
             ],
         }).compileComponents();
 

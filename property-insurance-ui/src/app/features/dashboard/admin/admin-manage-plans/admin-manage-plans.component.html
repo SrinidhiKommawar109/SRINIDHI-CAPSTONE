@@ -100,22 +100,32 @@
             <table class="w-full text-left text-xs">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50">
+                        <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Plan ID</th>
                         <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Plan Name</th>
                         <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Premium</th>
                         <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Coverage</th>
                         <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100">Frequency</th>
+                        <th class="px-6 py-3 font-semibold text-slate-900 dark:text-slate-100 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                     <ng-container *ngFor="let cat of categories">
                         <ng-container *ngFor="let sub of cat.subCategories">
                             <tr *ngFor="let plan of sub.plans" class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">{{ plan.id }}
+                                </td>
                                 <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">{{ plan.planName }}
                                 </td>
                                 <td class="px-6 py-4 dark:text-slate-200">₹{{ plan.basePremium | number: '1.2-2' }}</td>
                                 <td class="px-6 py-4 dark:text-slate-200">₹{{ plan.baseCoverageAmount | number: '1.0-0'
                                     }}</td>
                                 <td class="px-6 py-4 dark:text-slate-200">{{ getFrequencyLabel(plan.frequency) }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button (click)="deletePlan(plan.id)"
+                                        class="text-rose-600 hover:text-rose-500 font-semibold transition-colors">
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
                         </ng-container>
                     </ng-container>

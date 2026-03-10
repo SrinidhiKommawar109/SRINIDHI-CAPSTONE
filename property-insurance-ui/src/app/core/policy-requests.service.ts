@@ -35,12 +35,23 @@ export interface PolicyRequest {
   plan?: {
     planName: string;
   } | null;
+
+  claimsOfficerId?: number;
+  claimsOfficerName?: string;
+  claimId?: number;
+  claimStatus?: string;
+
+  customerName?: string;
+  planName?: string;
+  agentName?: string;
+  formType?: string;
 }
 
 export interface SubmitPropertyPayload {
   propertyAddress: string;
   propertyValue: number;
   propertyAge: number;
+  propertyDetailsJson?: string;
 }
 
 export interface CalculateRiskResponse {
@@ -64,8 +75,12 @@ export class PolicyRequestsService {
   private readonly baseUrl = `${environment.apiBaseUrl}/PolicyRequests`;
   private readonly plansUrl = `${environment.apiBaseUrl}/PropertyPlans`;
 
-  getAllPlans(): Observable<PropertyPlan[]> {
-    return this.http.get<PropertyPlan[]>(this.plansUrl);
+  getAllPlans(subCategoryId?: number): Observable<PropertyPlan[]> {
+    let url = this.plansUrl;
+    if (subCategoryId) {
+      url += `?subCategoryId=${subCategoryId}`;
+    }
+    return this.http.get<PropertyPlan[]>(url);
   }
 
   createRequest(planId: number): Observable<string> {
@@ -89,9 +104,9 @@ export class PolicyRequestsService {
     ) as Observable<string>;
   }
 
-  sendForm(requestId: number): Observable<string> {
+  sendForm(requestId: number, formType: string): Observable<string> {
     return this.http.put(
-      `${this.baseUrl}/${requestId}/send-form`,
+      `${this.baseUrl}/${requestId}/send-form?formType=${encodeURIComponent(formType)}`,
       {},
       { responseType: 'text' },
     ) as Observable<string>;
@@ -147,6 +162,10 @@ export class PolicyRequestsService {
     return this.http.get<PolicyRequest[]>(
       this.baseUrl + '/agent/assigned',
     );
+  }
+
+  getAdminAllRequests(): Observable<PolicyRequest[]> {
+    return this.http.get<PolicyRequest[]>(`${this.baseUrl}/admin/all`);
   }
 }
 

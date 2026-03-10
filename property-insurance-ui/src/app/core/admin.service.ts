@@ -32,6 +32,10 @@ export class AdminService {
     return this.http.get(`${this.baseUrl}/stats`);
   }
 
+  deletePlan(id: number): Observable<any> {
+    return this.http.delete(`${environment.apiBaseUrl}/PropertyPlans/${id}`);
+  }
+
   getStaff(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/staff`);
   }

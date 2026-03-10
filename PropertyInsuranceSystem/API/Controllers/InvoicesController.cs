@@ -1,33 +1,31 @@
-﻿using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-namespace API.Controllers
+
+namespace API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class InvoicesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class InvoicesController : ControllerBase
+    private readonly IInvoiceService _invoiceService;
+
+    public InvoicesController(IInvoiceService invoiceService)
     {
-        private readonly ApplicationDbContext _context;
+        _invoiceService = invoiceService;
+    }
 
-        public InvoicesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+    [HttpGet("customer/invoices")]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> GetMyInvoices()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized();
 
-        // STEP 5 - Customer View Their Invoices
-        [HttpGet("customer/invoices")]
-        [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> GetMyInvoices()
-        {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            var invoices = await _context.Invoices
-                .Where(i => i.CustomerId == userId)
-                .ToListAsync();
-
-            return Ok(invoices);
-        }
+        var userId = int.Parse(userIdClaim.Value);
+        var invoices = await _invoiceService.GetMyInvoicesAsync(userId);
+        return Ok(invoices);
     }
 }

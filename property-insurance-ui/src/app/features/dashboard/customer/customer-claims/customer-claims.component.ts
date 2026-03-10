@@ -20,11 +20,26 @@ export class CustomerClaimsComponent {
         propertyAddress: '',
         propertyValue: 0,
         propertyAge: 0,
+        claimAmount: 0,
+        photos: [],
     };
     claimMessage = '';
+    selectedFileNames: string[] = [];
+
+    handleFileSelect(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) {
+            this.claimPayload.photos = Array.from(input.files);
+            this.selectedFileNames = this.claimPayload.photos.map(f => f.name);
+        }
+    }
 
     fileClaim(): void {
         if (!this.claimPayload.policyRequestId) return;
+        if (this.claimPayload.claimAmount <= 0) {
+            this.claimMessage = 'Please enter a valid claim amount.';
+            return;
+        }
         this.claimMessage = '';
         this.claims.createClaim(this.claimPayload).subscribe({
             next: (msg) => {
@@ -37,4 +52,5 @@ export class CustomerClaimsComponent {
             },
         });
     }
+
 }
