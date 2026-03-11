@@ -14,19 +14,22 @@ public class ClaimsService : IClaimsService
     private readonly IRepository<Notification> _notificationRepository;
     private readonly IClaimRepository _claimReadRepository;
     private readonly IPolicyRequestRepository _policyRequestRepository;
+    private readonly IInvoiceService _invoiceService;
 
     public ClaimsService(
         IRepository<ClaimEntity> claimRepository,
         IRepository<Invoice> invoiceRepository,
         IRepository<Notification> notificationRepository,
         IClaimRepository claimReadRepository,
-        IPolicyRequestRepository policyRequestRepository)
+        IPolicyRequestRepository policyRequestRepository,
+        IInvoiceService invoiceService)
     {
         _claimRepository = claimRepository;
         _invoiceRepository = invoiceRepository;
         _notificationRepository = notificationRepository;
         _claimReadRepository = claimReadRepository;
         _policyRequestRepository = policyRequestRepository;
+        _invoiceService = invoiceService;
     }
 
     public async Task FileClaimAsync(CreateClaimDto dto, int userId)
@@ -107,26 +110,13 @@ public class ClaimsService : IClaimsService
             if (policy == null)
                 throw new InvalidOperationException("Policy not found.");
 
-            var invoice = new Invoice
-            {
-                PolicyRequestId = policy.Id,
-                InvoiceNumber = "INV-" + Guid.NewGuid().ToString().Substring(0, 8),
-                GeneratedDate = DateTime.UtcNow,
-                TotalPremium = policy.TotalPremium,
-                InstallmentAmount = policy.InstallmentAmount,
-                InstallmentCount = policy.InstallmentCount,
-                ClaimAmount = claim.ClaimAmount,
-                PlanName = policy.Plan.PlanName,
-                CustomerId = policy.CustomerId
-            };
-
-            await _invoiceRepository.AddAsync(invoice);
+            await _invoiceService.GenerateInvoiceAsync(policy, claim.ClaimAmount);
 
             await _notificationRepository.AddAsync(new Notification
             {
                 UserId = policy.CustomerId,
                 Title = "Claim Approved",
-                Message = $"Your claim for {policy.Plan.PlanName} has been approved. Invoice {invoice.InvoiceNumber} generated.",
+                Message = $"Your claim for {policy.Plan.PlanName} has been approved.",
                 Type = "success"
             });
 

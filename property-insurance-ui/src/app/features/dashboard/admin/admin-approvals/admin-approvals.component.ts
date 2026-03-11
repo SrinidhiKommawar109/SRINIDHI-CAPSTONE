@@ -17,6 +17,7 @@ export class AdminApprovalsComponent implements OnInit {
     pendingRequests: PolicyRequest[] = [];
     loading = false;
     error = '';
+    processingIds = new Set<number>();
 
     ngOnInit(): void {
         this.loadPending();
@@ -46,13 +47,20 @@ export class AdminApprovalsComponent implements OnInit {
     }
 
     approveAfterCustomer(requestId: number): void {
+        if (this.processingIds.has(requestId)) return;
+
+        this.processingIds.add(requestId);
+        this.cdr.detectChanges();
+
         this.policyRequests.adminApprove(requestId).subscribe({
             next: () => {
                 this.notifications.show({ title: 'Policy approved', message: `Request #${requestId} approved.`, type: 'success' });
+                this.processingIds.delete(requestId);
                 this.loadPending();
             },
             error: (err) => {
                 this.error = err?.error?.title || 'Failed to approve.';
+                this.processingIds.delete(requestId);
                 this.cdr.detectChanges();
             },
         });

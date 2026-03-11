@@ -35,9 +35,9 @@
             </div>
             <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button type="button"
-                    class="w-full rounded-md bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition-all dark:bg-slate-50 dark:text-slate-950 dark:hover:bg-slate-200"
-                    (click)="approveAfterCustomer(req.id)">
-                    Final Approve &amp; Issue Policy
+                    class="w-full rounded-md bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition-all dark:bg-slate-50 dark:text-slate-950 dark:hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="processingIds.has(req.id)" (click)="approveAfterCustomer(req.id)">
+                    {{ processingIds.has(req.id) ? 'Approving...' : 'Final Approve & Issue Policy' }}
                 </button>
             </div>
         </div>

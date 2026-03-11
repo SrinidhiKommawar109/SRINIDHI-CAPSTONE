@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface PropertyPlan {
@@ -90,7 +90,12 @@ export class PolicyRequestsService {
   }
 
   getAdminPending(): Observable<PolicyRequest[]> {
-    return this.http.get<PolicyRequest[]>(this.baseUrl + '/admin/pending');
+    return this.http.get<PolicyRequest[]>(this.baseUrl + '/admin/pending').pipe(
+      map(requests => requests.map(req => ({
+        ...req,
+        riskScore: req.riskScore !== undefined ? Math.min(100, req.riskScore) : undefined
+      })))
+    );
   }
 
   assignAgent(requestId: number, agentId: number, adminNotes?: string): Observable<string> {
@@ -127,6 +132,11 @@ export class PolicyRequestsService {
     return this.http.put<CalculateRiskResponse>(
       `${this.baseUrl}/${requestId}/calculate-risk`,
       {},
+    ).pipe(
+      map(res => ({
+        ...res,
+        riskScore: Math.min(100, res.riskScore)
+      }))
     );
   }
 
@@ -149,23 +159,43 @@ export class PolicyRequestsService {
   getMyRequests(): Observable<PolicyRequest[]> {
     return this.http.get<PolicyRequest[]>(
       this.baseUrl + '/customer/my-requests',
+    ).pipe(
+      map(requests => requests.map(req => ({
+        ...req,
+        riskScore: req.riskScore !== undefined ? Math.min(100, req.riskScore) : undefined
+      })))
     );
   }
 
   getAgentApproved(): Observable<PolicyRequest[]> {
     return this.http.get<PolicyRequest[]>(
       this.baseUrl + '/agent/approved',
+    ).pipe(
+      map(requests => requests.map(req => ({
+        ...req,
+        riskScore: req.riskScore !== undefined ? Math.min(100, req.riskScore) : undefined
+      })))
     );
   }
 
   getAgentAssigned(): Observable<PolicyRequest[]> {
     return this.http.get<PolicyRequest[]>(
       this.baseUrl + '/agent/assigned',
+    ).pipe(
+      map(requests => requests.map(req => ({
+        ...req,
+        riskScore: req.riskScore !== undefined ? Math.min(100, req.riskScore) : undefined
+      })))
     );
   }
 
   getAdminAllRequests(): Observable<PolicyRequest[]> {
-    return this.http.get<PolicyRequest[]>(`${this.baseUrl}/admin/all`);
+    return this.http.get<PolicyRequest[]>(`${this.baseUrl}/admin/all`).pipe(
+      map(requests => requests.map(req => ({
+        ...req,
+        riskScore: req.riskScore !== undefined ? Math.min(100, req.riskScore) : undefined
+      })))
+    );
   }
 }
 
