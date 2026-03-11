@@ -69,11 +69,35 @@
                 </div>
             </div>
 
-            <div class="py-4 space-y-1">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Event Location</p>
-                <p class="text-xs text-slate-600 dark:text-slate-400 italic leading-relaxed">
-                    {{ claim.propertyAddress }}
+            <div class="grid grid-cols-2 gap-4 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Incident Date</p>
+                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ claim.incidentDate | date:'mediumDate' }}</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Incident Type</p>
+                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ claim.incidentType }}</p>
+                </div>
+            </div>
+
+            <div class="py-4 space-y-1 border-b border-slate-100 dark:border-slate-800/50">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</p>
+                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {{ claim.description || 'No description provided.' }}
                 </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                <div class="space-y-1">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Event Location</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 italic leading-relaxed">
+                        {{ claim.propertyAddress }}
+                    </p>
+                </div>
+                <div class="space-y-1 text-right">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Submitted On</p>
+                    <p class="text-[10px] font-medium text-slate-500 dark:text-slate-500">{{ claim.claimSubmittedDate | date:'medium' }}</p>
+                </div>
             </div>
 
             <!-- Photos Section -->

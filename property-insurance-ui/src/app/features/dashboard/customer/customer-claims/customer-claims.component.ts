@@ -21,6 +21,10 @@ export class CustomerClaimsComponent {
         propertyValue: 0,
         propertyAge: 0,
         claimAmount: 0,
+        incidentDate: '',
+        incidentType: '',
+        description: '',
+        claimSubmittedDate: new Date().toISOString().split('T')[0],
         photos: [],
     };
     claimMessage = '';

@@ -1,0 +1,134 @@
+# Technical Project Summary: PropShield System Deep Dive
+
+This document provides a comprehensive A-Z technical breakdown of the PropShield Property Insurance System, structured for a 15-slide presentation.
+
+---
+
+## Slide 1: Title Slide
+**Title:** PropShield: Technical Architecture & API Full-Stack Overview
+**Subtitle:** A deep dive into Entities, Controllers, and Endpoints
+* **Presenter:** [Your Name]
+* **Focus:** Full-cycle insurance management from registration to claim payout.
+
+---
+
+## Slide 2: System Architecture Overview
+**Built with Modern Enterprise Standards:**
+* **Layers:** 
+    * **Domain:** Core entities, enums, and base logic (Independent).
+    * **Application:** Services, Interfaces, and DTOs (Business Logic).
+    * **Infrastructure:** EF Core Persistence, Repositories, Migrations.
+    * **API:** RESTful endpoints with ASP.NET Core 8.0.
+* **Frontend:** Angular Standalone components with Tailwind CSS integration.
+
+---
+
+## Slide 3: Core Domain Entities (1/3)
+**User & Identity:**
+* **ApplicationUser:** Extends identity with `FullName`, `Role` (Admin, Agent, Customer, ClaimsOfficer), `WalletBalance`, and `IsActive`.
+* **RefreshToken:** Manages long-lived session security.
+* **BaseEntity:** Common properties like [Id](file:///e:/Capstone/PropertyInsuranceSystem/API/Controllers/PolicyRequestsController.cs#20-25), `CreatedAt`, and `UpdatedAt`.
+
+---
+
+## Slide 4: Core Domain Entities (2/3)
+**Product & Policy:**
+* **PropertyCategory & SubCategory:** Defines property types (e.g., Residential -> Apartment).
+* **PropertyPlans:** Insurance products with `BaseCoverageAmount`, `CoverageRate`, `BasePremium`, and `AgentCommission`.
+* **PolicyRequest:** The lifecycle container for a customer's insurance journey.
+
+---
+
+## Slide 5: Core Domain Entities (3/3)
+**Claims & Finance:**
+* **Claim:** Detailed record of loss with `IncidentDate`, `IncidentType`, `ClaimAmount`, `PhotoUrls`, and `Status`.
+* **Invoice:** Financial record generated upon policy purchase or claim approval.
+* **Notification:** Real-time user alerts for status changes.
+
+---
+
+## Slide 6: AuthController (Identity Management)
+**Endpoints (A-Z):**
+* `POST /api/Auth/register`: Self-registration for Customers.
+* `POST /api/Auth/login`: Secure login returning JWT and user roles.
+* `POST /api/Auth/create-user` [Admin]: Management tool to create Agents or Claims Officers.
+* `POST /api/Auth/redeem`: System for processing wallet withdrawals/payouts.
+
+---
+
+## Slide 7: PropertyPlans & Category Controllers
+**Product Management:**
+* `GET /api/PropertyPlans`: Fetches all available insurance plans (filtered by category).
+* `POST /api/PropertyPlans` [Admin]: Create new insurance products with custom rates.
+* `DELETE /api/PropertyPlans/{id}`: Remove outdated plans.
+* `GET /api/Category`: Retrieve hierarchy of property types.
+
+---
+
+## Slide 8: PolicyRequestsController (Customer Workflow)
+**The Insurance Journey - Initiation:**
+* `POST /api/PolicyRequests/create`: Customer submits basic request.
+* `GET /api/PolicyRequests/customer/my-requests`: Personal dashboard.
+* `PUT /api/PolicyRequests/{id}/submit-form`: Customer provides specific property details (Age, Value, Photos).
+* `PUT /api/PolicyRequests/{id}/buy`: Final customer confirmation of the calculated premium.
+
+---
+
+## Slide 9: PolicyRequestsController (Admin & Agent)
+**The Insurance Journey - Processing:**
+* `GET /api/PolicyRequests/admin/pending`: Global queue of new requests.
+* `PUT /api/PolicyRequests/{id}/assign-agent/{agentId}`: Manual dispatching to agents.
+* `GET /api/PolicyRequests/agent/assigned`: Agent's personal work queue.
+* `PUT /api/PolicyRequests/{id}/send-form`: Agent pushes specialized forms to customers.
+
+---
+
+## Slide 10: PolicyRequestsController (Risk & Finalization)
+**Closing the Loop:**
+* `PUT /api/PolicyRequests/{id}/calculate-risk` [Agent]: Algorithmic determination of premium based on property age and value.
+* `PUT /api/PolicyRequests/{id}/admin-approve`: Final gatekeeper approval before the policy becomes active.
+* `GET /api/PolicyRequests/admin/all`: Complete history audit.
+
+---
+
+## Slide 11: ClaimsController (The Safety Net)
+**Handling Losses:**
+* `POST /api/Claims` [Customer]: File a new claim via multipart/form-data (includes metadata + photos).
+* `GET /api/Claims/pending` [ClaimsOfficer]: queue of claims needing review.
+* `PUT /api/Claims/{id}/verify` [ClaimsOfficer]: Decision endpoint (Approve/Reject) with logic for invoice triggering.
+* `GET /api/Claims/history`: Full archive of past claim decisions.
+
+---
+
+## Slide 12: AdminController & Statistics
+**System Oversight:**
+* `GET /api/Admin/stats`: High-level metrics for dashboard graphs.
+    * Total Customers, Agents, and Policies.
+    * Revenue Growth tracking.
+    * Performance leaderboard (Top Plans & Top Agents).
+* `GET /api/Admin/agents`: User management for active agents.
+
+---
+
+## Slide 13: Invoices & Notifications
+**Communication & Finance:**
+* `GET /api/Invoices`: Historical record of all premium payments and claim payouts.
+* `GET /api/Notifications`: Individual user alert inbox.
+* **Logic:** Notifications are auto-triggered by the [ClaimsService](file:///e:/Capstone/PropertyInsuranceSystem/Application/Services/ClaimsService.cs#10-154) and `PolicyRequestService`.
+
+---
+
+## Slide 14: DTO & Data Transfer Layer
+**Clean Data Boundaries:**
+* **Request DTOs:** [CreateClaimDto](file:///e:/Capstone/PropertyInsuranceSystem/Application/DTOs/CreateClaimDto.cs#3-18), `LoginRequestDto`, `SubmitPropertyDto`.
+* **Response DTOs:** `PlanResponseDto`, `AdminStatsDto`, `AuthResponseDto`.
+* **Purpose:** Ensures internal entities are never exposed directly, maintaining security and flexibility.
+
+---
+
+## Slide 15: Security & Technical Safeguards
+**Robustness at Core:**
+* **JWT Authentication:** Secure stateless communication across all layers.
+* **Role-Based Access Control (RBAC):** Strict attribute-based protection on every controller endpoint.
+* **File Upload Security:** GUID-based renaming and controlled wroot directory management.
+* **EF Core Migrations:** Versioned database schema management.

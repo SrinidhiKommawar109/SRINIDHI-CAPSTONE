@@ -1,4 +1,4 @@
-﻿namespace Application.DTOs
+namespace Application.DTOs
 {
     public class CreateClaimDto
     {
@@ -10,5 +10,9 @@
         public decimal ClaimAmount { get; set; }
 
         public string? PhotoPaths { get; set; } // Populated by controller
+        public DateTime IncidentDate { get; set; }
+        public string IncidentType { get; set; }
+        public string Description { get; set; }
+        public DateTime ClaimSubmittedDate { get; set; }
     }
 }

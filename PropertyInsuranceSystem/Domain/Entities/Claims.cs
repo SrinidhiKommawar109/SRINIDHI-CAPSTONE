@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +23,9 @@ namespace Domain.Entities
         public int? AssignedOfficerId { get; set; }
         public ApplicationUser? AssignedOfficer { get; set; }
         public string? PhotoUrls { get; set; } // comma separated paths
+        public DateTime? IncidentDate { get; set; }
+        public string? IncidentType { get; set; }
+        public string? Description { get; set; }
+        public DateTime? ClaimSubmittedDate { get; set; }
     }
 }

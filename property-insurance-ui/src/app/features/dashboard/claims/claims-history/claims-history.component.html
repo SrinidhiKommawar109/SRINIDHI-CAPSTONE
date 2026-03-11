@@ -55,7 +55,31 @@
                 </div>
             </div>
 
-            <!-- Remarks from History -->
+            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 py-3 border-t border-slate-100 dark:border-slate-800/50">
+                <div class="space-y-0.5">
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Incident Type</p>
+                    <p class="text-[10px] font-medium text-slate-700 dark:text-slate-300">{{ claim.incidentType || 'N/A' }}</p>
+                </div>
+                <div class="space-y-0.5">
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Incident Date</p>
+                    <p class="text-[10px] font-medium text-slate-700 dark:text-slate-300">{{ claim.incidentDate | date:'shortDate' }}</p>
+                </div>
+                <div class="space-y-0.5">
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Location</p>
+                    <p class="text-[10px] font-medium text-slate-700 dark:text-slate-300 truncate" [title]="claim.propertyAddress">{{ claim.propertyAddress }}</p>
+                </div>
+                <div class="space-y-0.5 text-right">
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Submitted</p>
+                    <p class="text-[10px] font-medium text-slate-500">{{ claim.claimSubmittedDate | date:'short' }}</p>
+                </div>
+            </div>
+
+            <div *ngIf="claim.description" class="mt-2 py-2 border-t border-slate-50 dark:border-slate-800/30">
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Description</p>
+                <p class="text-[10px] text-slate-600 dark:text-slate-400 italic line-clamp-2" [title]="claim.description">
+                    "{{ claim.description }}"
+                </p>
+            </div>
             <div *ngIf="claim.remarks"
                 class="mt-4 p-3 rounded-xl bg-slate-50/50 border border-slate-100 text-xs text-slate-600 dark:bg-slate-800/30 dark:border-slate-700/50 dark:text-slate-400 italic">
                 <span class="font-bold uppercase tracking-widest text-[9px] text-slate-400 mr-2 not-italic">Decision

@@ -94,6 +94,18 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("ClaimAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("ClaimSubmittedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("IncidentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IncidentType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhotoUrls")
                         .HasColumnType("nvarchar(max)");
 

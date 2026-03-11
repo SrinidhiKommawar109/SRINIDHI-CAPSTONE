@@ -33,12 +33,51 @@
                         placeholder="Years" [(ngModel)]="claimPayload.propertyAge" />
                 </div>
             </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Incident Date</label>
+                    <input type="date" [max]="claimPayload.claimSubmittedDate"
+                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        [(ngModel)]="claimPayload.incidentDate" />
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Incident Type</label>
+                    <select
+                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                        [(ngModel)]="claimPayload.incidentType">
+                        <option value="" disabled selected>Select type</option>
+                        <option value="Fire">Fire</option>
+                        <option value="Theft">Theft</option>
+                        <option value="Flood">Flood</option>
+                        <option value="Earthquake">Earthquake</option>
+                        <option value="Vandalism">Vandalism</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
             <div>
-                <label class="text-[10px] font-bold uppercase tracking-widest text-rose-600 mb-1.5 block">Impacted
-                    Value (Claim Amount)</label>
-                <input type="number"
-                    class="w-full rounded-xl border border-rose-200 bg-rose-50/30 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-rose-900/30 dark:text-slate-50"
-                    placeholder="₹" [(ngModel)]="claimPayload.claimAmount" />
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Description</label>
+                <textarea maxlength="500"
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                    placeholder="Describe what happened..." [(ngModel)]="claimPayload.description" rows="3"></textarea>
+                <div class="flex justify-end mt-1">
+                    <span class="text-[10px] text-slate-400">{{ claimPayload.description.length }}/500 characters</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-rose-600 mb-1.5 block">Impacted
+                        Value (Claim Amount)</label>
+                    <input type="number"
+                        class="w-full rounded-xl border border-rose-200 bg-rose-50/30 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:bg-slate-800 dark:border-rose-900/30 dark:text-slate-50"
+                        placeholder="₹" [(ngModel)]="claimPayload.claimAmount" />
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Claim Submitted Date</label>
+                    <input type="date" readonly
+                        class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm focus:outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 cursor-not-allowed"
+                        [(ngModel)]="claimPayload.claimSubmittedDate" />
+                </div>
             </div>
             <div>
                 <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5 block">Supporting

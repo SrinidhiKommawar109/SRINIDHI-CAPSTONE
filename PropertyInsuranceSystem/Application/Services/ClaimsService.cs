@@ -53,7 +53,11 @@ public class ClaimsService : IClaimsService
             ClaimAmount = dto.ClaimAmount,
             Status = ClaimStatus.Pending,
             Remarks = "",
-            PhotoUrls = dto.PhotoPaths
+            PhotoUrls = dto.PhotoPaths,
+            IncidentDate = dto.IncidentDate,
+            IncidentType = dto.IncidentType,
+            Description = dto.Description,
+            ClaimSubmittedDate = dto.ClaimSubmittedDate
         };
         //Officer Assignment
         var officersWithCounts = await _claimReadRepository.GetOfficersWithApprovedClaimsCountAsync();

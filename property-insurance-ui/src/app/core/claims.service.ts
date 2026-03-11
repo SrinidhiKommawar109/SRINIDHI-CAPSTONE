@@ -27,6 +27,10 @@ export interface Claim {
     email: string;
   };
   photoUrls?: string;
+  incidentDate?: string;
+  incidentType?: string;
+  description?: string;
+  claimSubmittedDate?: string;
 }
 
 export interface VerifyClaimPayload {
@@ -40,6 +44,10 @@ export interface CreateClaimPayload {
   propertyValue: number;
   propertyAge: number;
   claimAmount: number;
+  incidentDate: string;
+  incidentType: string;
+  description: string;
+  claimSubmittedDate: string;
   photos?: File[];
 }
 
@@ -65,6 +73,10 @@ export class ClaimsService {
     formData.append('propertyValue', payload.propertyValue.toString());
     formData.append('propertyAge', payload.propertyAge.toString());
     formData.append('claimAmount', payload.claimAmount.toString());
+    formData.append('incidentDate', payload.incidentDate);
+    formData.append('incidentType', payload.incidentType);
+    formData.append('description', payload.description);
+    formData.append('claimSubmittedDate', payload.claimSubmittedDate);
 
     if (payload.photos) {
       payload.photos.forEach(file => {
