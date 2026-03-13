@@ -1,7 +1,0 @@
-﻿E:\Capstone\PropertyInsuranceSystem\API.Tests\Controllers\PropertyPlansControllerTests.cs(38,40): error CS7036: There is no argument given that corresponds to the required parameter 'subCategoryId' of 'PropertyPlansController.GetAllPlans(int?)' [E:\Capstone\PropertyInsuranceSystem\API.Tests\API.Tests.csproj]
-
-Build FAILED.
-    0 Warning(s)
-    1 Error(s)
-
-Time Elapsed 00:00:01.85

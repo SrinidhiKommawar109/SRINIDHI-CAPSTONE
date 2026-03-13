@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClaimsService, Claim } from '../../../../core/claims.service';
 import { NotificationsService } from '../../../../core/notifications.service';
+import { AiAnalysisService } from '../../../../core/ai-analysis.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -14,10 +15,13 @@ import { environment } from '../../../../../environments/environment';
 export class ClaimsPendingComponent implements OnInit {
     private readonly claims = inject(ClaimsService);
     private readonly notifications = inject(NotificationsService);
+    private readonly ai = inject(AiAnalysisService);
     private readonly cdr = inject(ChangeDetectorRef);
 
     pendingClaims: Claim[] = [];
     claimRemarks: Record<number, string> = {};
+    analysisResults: Record<number, any> = {};
+    analyzing: Record<number, boolean> = {};
     loading = false;
     errorMessage = '';
     readonly apiUrl = environment.apiBaseUrl.replace('/api', '');
@@ -68,6 +72,47 @@ export class ClaimsPendingComponent implements OnInit {
                     this.cdr.detectChanges();
                 },
             });
+    }
+
+    async performAiAnalysis(claim: Claim): Promise<void> {
+        this.analyzing[claim.id] = true;
+        this.cdr.detectChanges();
+
+        try {
+            let extractedText = '';
+            const photos = this.getPhotos(claim.photoUrls);
+            const pdfs = photos.filter(p => p.toLowerCase().endsWith('.pdf'));
+
+            if (pdfs.length > 0) {
+                // Extract text from all PDFs found
+                for (const pdf of pdfs) {
+                    const text = await this.ai.extractTextFromPdf(this.apiUrl + pdf);
+                    extractedText += `--- Content from ${pdf.split('/').pop()} ---\n${text}\n\n`;
+                }
+            }
+
+            this.ai.analyzeClaim(extractedText, claim).subscribe({
+                next: (result) => {
+                    this.analysisResults[claim.id] = result;
+                    this.analyzing[claim.id] = false;
+                    this.notifications.show({
+                        title: 'Analysis Complete',
+                        message: `AI analysis for Claim #${claim.id} is ready.`,
+                        type: 'success'
+                    });
+                    this.cdr.detectChanges();
+                },
+                error: (err) => {
+                    console.error('Analysis failed', err);
+                    this.analyzing[claim.id] = false;
+                    this.cdr.detectChanges();
+                }
+            });
+        } catch (error) {
+            console.error('PDF extraction failed', error);
+            this.analyzing[claim.id] = false;
+            this.cdr.detectChanges();
+        }
     }
 
     private extractError(err: any): string {

@@ -38,11 +38,16 @@ public class ClaimsService : IClaimsService
         if (policy == null || policy.Status != PolicyRequestStatus.PolicyApproved)
             throw new InvalidOperationException("Invalid or unapproved policy.");
 
-        // Validation: Impacted value should not exceed coverage rate
+        // Validation: Impacted value should not exceed coverage rate, and must be at least 50% of coverage
         decimal propertyValue = policy.PropertyValue ?? 0m;
         decimal coverageAmount = propertyValue * policy.Plan.CoverageRate;
+        decimal minClaimAmount = coverageAmount / 2;
+
         if (dto.ClaimAmount > coverageAmount)
             throw new InvalidOperationException($"Claim amount ₹{dto.ClaimAmount} exceeds the maximum coverage of ₹{coverageAmount} ({policy.Plan.CoverageRate * 100}% of property value).");
+
+        if (dto.ClaimAmount < minClaimAmount)
+            throw new InvalidOperationException($"Claim amount ₹{dto.ClaimAmount} must be at least 50% of the coverage (₹{minClaimAmount}).");
 
         var claim = new ClaimEntity
         {

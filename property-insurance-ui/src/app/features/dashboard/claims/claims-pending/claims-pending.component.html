@@ -133,6 +133,43 @@
                         [(ngModel)]="claimRemarks[claim.id]" placeholder="Internal notes..." />
                 </div>
 
+                <!-- AI Analysis Section -->
+                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Risk Assessment</h4>
+                        <button type="button" 
+                            class="text-[10px] font-bold text-sky-600 hover:text-sky-500 disabled:text-slate-400 flex items-center gap-1 transition-colors"
+                            [disabled]="analyzing[claim.id]"
+                            (click)="performAiAnalysis(claim)">
+                            <svg *ngIf="analyzing[claim.id]" class="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            {{ analyzing[claim.id] ? 'Analyzing...' : 'Do AI Analysis' }}
+                        </button>
+                    </div>
+
+                    <div *ngIf="analysisResults[claim.id]" class="space-y-3 animate-in fade-in duration-300">
+                        <div class="flex items-center gap-2">
+                            <span [ngClass]="{
+                                'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': analysisResults[claim.id].riskLevel === 'Low',
+                                'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': analysisResults[claim.id].riskLevel === 'Medium',
+                                'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400': analysisResults[claim.id].riskLevel === 'High'
+                            }" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight">
+                                {{ analysisResults[claim.id].riskLevel }} Risk
+                            </span>
+                            <p class="text-[10px] text-slate-500 italic">{{ analysisResults[claim.id].riskReason }}</p>
+                        </div>
+                        
+                        <ul class="space-y-1.5">
+                            <li *ngFor="let point of analysisResults[claim.id].summary" class="flex items-start gap-2">
+                                <span class="mt-1.5 h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600 flex-shrink-0"></span>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-normal">{{ point }}</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="flex items-center gap-3">
                     <button type="button"
                         class="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-colors shadow-sm shadow-emerald-200 dark:shadow-none"
