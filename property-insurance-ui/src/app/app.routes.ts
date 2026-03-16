@@ -22,6 +22,8 @@ import { AgentTasksComponent } from './features/dashboard/agent/agent-tasks/agen
 import { AgentEarningsComponent } from './features/dashboard/agent/agent-earnings/agent-earnings.component';
 import { ClaimsPendingComponent } from './features/dashboard/claims/claims-pending/claims-pending.component';
 import { ClaimsHistoryComponent } from './features/dashboard/claims/claims-history/claims-history.component';
+import { CustomerTransferRequestsComponent } from './features/dashboard/customer/customer-transfer-requests/customer-transfer-requests.component';
+import { AdminTransferApprovalsComponent } from './features/dashboard/admin/admin-transfer-approvals/admin-transfer-approvals.component';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -41,6 +43,7 @@ export const routes: Routes = [
       { path: 'analytics', component: AdminAnalyticsComponent },
       { path: 'user-management', component: AdminUserManagementComponent },
       { path: 'policy-management', component: AdminPolicyManagementComponent },
+      { path: 'transfer-approvals', component: AdminTransferApprovalsComponent },
     ],
   },
   {
@@ -66,6 +69,7 @@ export const routes: Routes = [
       { path: 'rewards', component: CustomerRewardsComponent },
       { path: 'claims', component: CustomerClaimsComponent },
       { path: 'invoices', component: CustomerInvoicesComponent },
+      { path: 'transfer-requests', component: CustomerTransferRequestsComponent },
     ],
   },
   {

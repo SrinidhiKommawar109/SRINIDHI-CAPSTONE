@@ -1,0 +1,135 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Policy Ownership Transfers</h2>
+    <button (click)="openForm()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+      <i class="fas fa-exchange-alt"></i> New Transfer Request
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+  </div>
+
+  <!-- Requests Table -->
+  <div *ngIf="!isLoading && myRequests.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+    <table class="w-full text-left">
+      <thead class="bg-gray-50 border-b border-gray-100">
+        <tr>
+          <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Policy</th>
+          <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">New Owner</th>
+          <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
+          <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Requested At</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr *ngFor="let req of myRequests" class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4">
+            <div class="font-medium text-gray-900">{{req.policyPlanName}}</div>
+            <div class="text-xs text-gray-500">ID: {{req.policyId}}</div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="text-sm text-gray-900">{{req.newOwnerName}}</div>
+            <div class="text-xs text-gray-500">{{req.newOwnerEmail}}</div>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-600">{{req.transferReason}}</td>
+          <td class="px-6 py-4">
+            <span [class]="getStatusClass(req.status)" class="px-2 py-1 rounded-full text-xs font-medium">
+              {{req.status}}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{req.requestedAt | date:'mediumDate'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && myRequests.length === 0" class="text-center py-12 bg-white rounded-xl border-2 border-dashed border-gray-200">
+    <i class="fas fa-exchange-alt text-4xl text-gray-300 mb-4"></i>
+    <p class="text-gray-500">No transfer requests found.</p>
+  </div>
+
+  <!-- Modal Form -->
+  <div *ngIf="showForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 class="text-xl font-bold text-gray-800">
+          {{ currentStep === 1 ? 'New Transfer Request' : 'Upload Documents' }}
+        </h3>
+        <button (click)="closeForm()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-6">
+        <!-- Step 1: Details -->
+        <div *ngIf="currentStep === 1">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Select Policy</label>
+              <select [(ngModel)]="newRequest.policyId" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <option [value]="0">Select a policy...</option>
+                <option *ngFor="let p of myPolicies" [value]="p.id">{{p.planName}} (ID: {{p.id}})</option>
+              </select>
+            </div>
+
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Transfer Reason</label>
+              <select [(ngModel)]="newRequest.transferReason" (change)="onReasonChange()" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <option value="">Select reason...</option>
+                <option value="Sale">Sale of Property</option>
+                <option value="Inheritance">Inheritance</option>
+                <option value="Gift">Gift / Donation</option>
+              </select>
+            </div>
+
+            <hr class="col-span-2 my-2 border-gray-100">
+            <h4 class="col-span-2 text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">New Owner Details</h4>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input type="text" [(ngModel)]="newRequest.newOwnerName" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Enter name">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <input type="email" [(ngModel)]="newRequest.newOwnerEmail" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="owner@example.com">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input type="tel" [(ngModel)]="newRequest.newOwnerPhone" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="+91 00000 00000">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Documents -->
+        <div *ngIf="currentStep === 2">
+          <p class="text-sm text-gray-600 mb-4">Please upload the following documents for <strong>{{newRequest.transferReason}}</strong>:</p>
+          <div class="space-y-4">
+            <div *ngFor="let doc of requiredDocuments" class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{doc}}</label>
+              <input type="file" (change)="onFileSelected($event, doc)" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        <button (click)="closeForm()" class="px-6 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors">
+          Cancel
+        </button>
+        <button *ngIf="currentStep === 1" [disabled]="isSubmitting" (click)="submitRequest()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+          <span *ngIf="isSubmitting" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+          Next: Documents
+        </button>
+        <button *ngIf="currentStep === 2" [disabled]="isSubmitting" (click)="uploadDocuments()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+          <span *ngIf="isSubmitting" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+          Submit Request
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

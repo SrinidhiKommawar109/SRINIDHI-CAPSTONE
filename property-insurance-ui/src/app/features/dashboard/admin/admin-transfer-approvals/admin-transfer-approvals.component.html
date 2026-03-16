@@ -1,0 +1,153 @@
+<div class="p-6">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Policy Transfer Approvals</h2>
+    <p class="text-gray-500">Review and action pending policy ownership transfer requests.</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex justify-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+  </div>
+
+  <!-- Requests Grid -->
+  <div *ngIf="!isLoading && pendingRequests.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let req of pendingRequests" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+      <div class="p-5 border-b border-gray-50 flex justify-between items-start">
+        <div>
+          <h3 class="font-bold text-gray-900">{{req.policyPlanName}}</h3>
+          <span class="text-xs text-gray-400">Request ID: {{req.id}}</span>
+        </div>
+        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">{{req.status}}</span>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs">CO</div>
+          <div>
+            <div class="text-xs text-gray-500 uppercase font-semibold">Current Owner</div>
+            <div class="text-sm font-medium">{{req.currentOwnerName}}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-indigo-600">
+          <i class="fas fa-arrow-down mx-auto text-xs animate-bounce"></i>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 rounded-full bg-green-50 flex items-center justify-center text-green-600 text-xs">NO</div>
+          <div>
+            <div class="text-xs text-gray-500 uppercase font-semibold">New Owner</div>
+            <div class="text-sm font-medium">{{req.newOwnerName}}</div>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <div class="text-xs text-gray-500 mb-1">Reason for Transfer</div>
+          <div class="text-sm px-3 py-1 bg-gray-50 rounded-lg inline-block">{{req.transferReason}}</div>
+        </div>
+      </div>
+
+      <div class="p-5 bg-gray-50 border-t border-gray-100">
+        <button (click)="viewRequest(req)" class="w-full py-2 bg-white border border-gray-200 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors">
+          View & Action
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && pendingRequests.length === 0" class="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100">
+    <div class="h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="fas fa-check text-2xl text-gray-300"></i>
+    </div>
+    <p class="text-gray-500 font-medium">All transfer requests have been processed!</p>
+  </div>
+
+  <!-- Detail Modal -->
+  <div *ngIf="selectedRequest" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div>
+          <h3 class="text-xl font-bold text-gray-800">Review Transfer Request</h3>
+          <p class="text-xs text-gray-500">Processing Request ID #{{selectedRequest.id}}</p>
+        </div>
+        <button (click)="closeModal()" class="h-8 w-8 rounded-full hover:bg-white flex items-center justify-center text-gray-400">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Request Details -->
+          <div class="space-y-6">
+            <section>
+              <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Transfer Information</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-gray-50 rounded-2xl">
+                  <div class="text-xs text-gray-500">Policy</div>
+                  <div class="font-bold">{{selectedRequest.policyPlanName}}</div>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-2xl">
+                  <div class="text-xs text-gray-500">Reason</div>
+                  <div class="font-bold">{{selectedRequest.transferReason}}</div>
+                </div>
+              </div>
+            </section>
+
+            <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
+              <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3">Target Owner</h4>
+              <div class="space-y-2 text-indigo-900">
+                <div class="flex justify-between font-medium">
+                  <span>Name:</span> <span>{{selectedRequest.newOwnerName}}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span>Email:</span> <span>{{selectedRequest.newOwnerEmail}}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span>Phone:</span> <span>{{selectedRequest.newOwnerPhone}}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Officer Assessment Notes</label>
+              <textarea [(ngModel)]="officerNotes" rows="4" class="w-full p-4 rounded-2xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-mono text-sm" placeholder="Internal notes or reason for rejection..."></textarea>
+            </div>
+          </div>
+
+          <!-- Documents -->
+          <div>
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Verification Documents</h4>
+            <div class="grid grid-cols-1 gap-3">
+              <a *ngFor="let doc of selectedRequest.documents" [href]="getFullDocumentUrl(doc.filePath)" target="_blank" class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-sm transition-all group">
+                <div class="flex items-center gap-4">
+                  <div class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                    <i class="far fa-file-pdf text-lg"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-gray-800">{{doc.documentType}}</div>
+                    <div class="text-[10px] text-gray-400">{{doc.uploadedAt | date:'medium'}}</div>
+                  </div>
+                </div>
+                <i class="fas fa-external-link-alt text-gray-200 group-hover:text-indigo-400 transition-colors"></i>
+              </a>
+              <div *ngIf="selectedRequest.documents.length === 0" class="text-center py-8 text-gray-400 italic text-sm">
+                No documents uploaded.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+        <button [disabled]="isProcessing" (click)="reject()" class="flex-1 py-3 bg-white border border-red-200 text-red-600 font-bold rounded-2xl hover:bg-red-50 transition-colors">
+          Reject Transfer
+        </button>
+        <button [disabled]="isProcessing" (click)="approve()" class="flex-[2] py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+          <span *ngIf="isProcessing" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+          Approve & Finalize Transfer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

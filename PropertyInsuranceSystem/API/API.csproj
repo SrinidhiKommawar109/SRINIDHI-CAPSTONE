@@ -29,6 +29,7 @@
     <Folder Include="Configurations\" />
     <Folder Include="Middlewares\" />
     <Folder Include="Extensions\" />
+    <Folder Include="wwwroot\uploads\claims\" />
   </ItemGroup>
 
 </Project>

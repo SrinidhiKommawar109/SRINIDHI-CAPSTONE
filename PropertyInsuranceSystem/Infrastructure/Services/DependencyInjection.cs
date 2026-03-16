@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IPropertyPlanRepository, PropertyPlanRepository>();
+        services.AddScoped<IPolicyTransferRepository, PolicyTransferRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAdminService, AdminService>();
@@ -46,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<IInvoiceService, InvoiceService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IPropertyPlanService, PropertyPlanService>();
+        services.AddScoped<IPolicyTransferService, PolicyTransferService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return services;

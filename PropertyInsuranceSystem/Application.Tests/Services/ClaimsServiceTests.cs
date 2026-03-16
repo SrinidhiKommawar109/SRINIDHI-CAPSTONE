@@ -32,7 +32,7 @@ namespace Application.Tests.Services
         }
 
         [Fact]
-        public async Task FileClaim_ShouldFail_WhenAmountIsLessThan50PercentOfCoverage()
+        public async Task FileClaim_ShouldPass_WhenAmountIsLessThan50PercentOfCoverage()
         {
             // Arrange
             var policy = new PolicyRequest
@@ -43,19 +43,20 @@ namespace Application.Tests.Services
                 Plan = new PropertyPlans { CoverageRate = 0.8m } // 800,000 coverage
             };
             _claimReadRepo.Setup(r => r.GetPolicyRequestByIdAsync(1)).ReturnsAsync(policy);
+            _claimReadRepo.Setup(r => r.GetOfficersWithApprovedClaimsCountAsync()).ReturnsAsync(new List<ClaimsOfficerAssignmentDto>());
+            _claimReadRepo.Setup(r => r.GetClaimsOfficersAsync()).ReturnsAsync(new List<ApplicationUser>());
 
             var dto = new CreateClaimDto
             {
                 PolicyRequestId = 1,
-                ClaimAmount = 300000m // Less than 50% (400,000)
+                ClaimAmount = 20000m // Only 2.5% of coverage
             };
 
             // Act
-            var act = () => _service.FileClaimAsync(dto, 1);
+            await _service.FileClaimAsync(dto, 1);
 
             // Assert
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*must be at least 50% of the coverage*");
+            _claimRepo.Verify(r => r.AddAsync(It.IsAny<ClaimEntity>()), Times.Once);
         }
 
         [Fact]

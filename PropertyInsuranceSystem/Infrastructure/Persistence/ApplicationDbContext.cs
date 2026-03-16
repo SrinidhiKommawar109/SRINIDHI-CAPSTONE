@@ -27,6 +27,9 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+
+    public DbSet<PolicyOwnershipTransfer> PolicyOwnershipTransfers { get; set; }
+    public DbSet<PolicyTransferDocument> PolicyTransferDocuments { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -59,6 +62,23 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<ApplicationUser>()
             .HasIndex(u => u.Email)
             .IsUnique();
+
+        modelBuilder.Entity<PolicyOwnershipTransfer>()
+            .HasOne(t => t.Policy)
+            .WithMany()
+            .HasForeignKey(t => t.PolicyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PolicyOwnershipTransfer>()
+            .HasOne(t => t.CurrentOwner)
+            .WithMany()
+            .HasForeignKey(t => t.CurrentOwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<PolicyTransferDocument>()
+            .HasOne(d => d.TransferRequest)
+            .WithMany(t => t.Documents)
+            .HasForeignKey(d => d.TransferRequestId);
 
         // ========================
         // SEED DATA
