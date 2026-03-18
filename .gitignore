@@ -11,3 +11,6 @@ obj/
 
 # Node modules (if Angular frontend exists)
 node_modules/
+
+appsettings.json
+appsettings.Development.json
