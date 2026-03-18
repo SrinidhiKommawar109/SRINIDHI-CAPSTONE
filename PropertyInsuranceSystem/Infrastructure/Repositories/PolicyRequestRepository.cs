@@ -50,7 +50,9 @@ public class PolicyRequestRepository : IPolicyRequestRepository
                 (r.Status == PolicyRequestStatus.AgentAssigned ||
                  r.Status == PolicyRequestStatus.FormSent ||
                  r.Status == PolicyRequestStatus.FormSubmitted ||
-                 r.Status == PolicyRequestStatus.RiskCalculated))
+                 r.Status == PolicyRequestStatus.RiskCalculated ||
+                 r.Status == PolicyRequestStatus.CustomerConfirmed ||
+                 r.Status == PolicyRequestStatus.PolicyApproved))
             .OrderByDescending(r => r.Id)
             .ToListAsync();
     }

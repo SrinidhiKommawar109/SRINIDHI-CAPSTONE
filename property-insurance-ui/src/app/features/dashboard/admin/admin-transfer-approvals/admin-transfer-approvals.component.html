@@ -64,89 +64,161 @@
   </div>
 
   <!-- Detail Modal -->
-  <div *ngIf="selectedRequest" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
-      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-        <div>
-          <h3 class="text-xl font-bold text-gray-800">Review Transfer Request</h3>
-          <p class="text-xs text-gray-500">Processing Request ID #{{selectedRequest.id}}</p>
+  <div *ngIf="selectedRequest" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-5xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[95vh] border border-white/20">
+      
+      <!-- Premium Glass Header -->
+      <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-green-50 to-white relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2 py-0.5 bg-green-600 text-white text-[10px] font-bold rounded uppercase tracking-wider">Audit Review</span>
+            <h3 class="text-2xl font-black text-gray-900 tracking-tight">Policy Ownership Transfer</h3>
+          </div>
+          <p class="text-sm text-gray-500 font-medium">Internal Audit ID: <span class="font-mono text-green-600">TRK-{{selectedRequest.id}}</span></p>
         </div>
-        <button (click)="closeModal()" class="h-8 w-8 rounded-full hover:bg-white flex items-center justify-center text-gray-400">
-          <i class="fas fa-times"></i>
+        <button (click)="closeModal()" class="h-10 w-10 rounded-2xl hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-gray-400 transition-all duration-200 border border-transparent hover:border-red-100 bg-white shadow-sm">
+          <i class="fas fa-times text-lg"></i>
         </button>
+        
+        <!-- Background decoration -->
+        <div class="absolute right-0 top-0 w-64 h-64 bg-green-200/20 blur-3xl rounded-full -mr-20 -mt-20"></div>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <!-- Request Details -->
-          <div class="space-y-6">
-            <section>
-              <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Transfer Information</h4>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="p-4 bg-gray-50 rounded-2xl">
-                  <div class="text-xs text-gray-500">Policy</div>
-                  <div class="font-bold">{{selectedRequest.policyPlanName}}</div>
+      <div class="flex-1 overflow-y-auto p-8 bg-[#fafafa]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- LEFT COLUMN: Request Context -->
+          <div class="lg:col-span-5 space-y-6">
+            <section class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+              <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Request Context</h4>
+              <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 rounded-2xl bg-gray-50/50">
+                  <span class="text-sm text-gray-500">Plan Name</span>
+                  <span class="font-bold text-gray-900">{{selectedRequest.policyPlanName}}</span>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-2xl">
-                  <div class="text-xs text-gray-500">Reason</div>
-                  <div class="font-bold">{{selectedRequest.transferReason}}</div>
+                <div class="flex justify-between items-center p-3 rounded-2xl bg-gray-50/50">
+                  <span class="text-sm text-gray-500">Reason</span>
+                  <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-black">{{selectedRequest.transferReason}}</span>
                 </div>
               </div>
             </section>
 
-            <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
-              <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3">Target Owner</h4>
-              <div class="space-y-2 text-indigo-900">
-                <div class="flex justify-between font-medium">
-                  <span>Name:</span> <span>{{selectedRequest.newOwnerName}}</span>
+            <section class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 relative overflow-hidden group">
+              <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <i class="fas fa-user-check text-6xl"></i>
+              </div>
+              <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Target Ownership Info</h4>
+              <div class="space-y-5">
+                <div class="flex items-start gap-4">
+                  <div class="h-10 w-10 rounded-2xl bg-green-600 flex items-center justify-center text-white shadow-lg shadow-green-100">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <div class="text-[10px] font-bold text-gray-400 uppercase">Intended New Owner</div>
+                    <div class="text-lg font-black text-gray-900 leading-tight">{{selectedRequest.newOwnerName}}</div>
+                  </div>
                 </div>
-                <div class="flex justify-between text-sm">
-                  <span>Email:</span> <span>{{selectedRequest.newOwnerEmail}}</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                  <span>Phone:</span> <span>{{selectedRequest.newOwnerPhone}}</span>
+                <div class="space-y-3 pt-2">
+                  <div class="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-2xl">
+                    <i class="fas fa-envelope text-green-500 w-4"></i>
+                    <span class="font-medium">{{selectedRequest.newOwnerEmail}}</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-2xl">
+                    <i class="fas fa-phone text-green-500 w-4"></i>
+                    <span class="font-medium">{{selectedRequest.newOwnerPhone}}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Officer Assessment Notes</label>
-              <textarea [(ngModel)]="officerNotes" rows="4" class="w-full p-4 rounded-2xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-mono text-sm" placeholder="Internal notes or reason for rejection..."></textarea>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Audit Conclusion Notes</label>
+              <textarea [(ngModel)]="officerNotes" rows="3" class="w-full p-5 rounded-2xl border border-gray-100 outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 transition-all text-sm font-medium placeholder:text-gray-300 bg-gray-50/30" placeholder="Enter findings or rejection reasons..."></textarea>
             </div>
           </div>
 
-          <!-- Documents -->
-          <div>
-            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Verification Documents</h4>
-            <div class="grid grid-cols-1 gap-3">
-              <a *ngFor="let doc of selectedRequest.documents" [href]="getFullDocumentUrl(doc.filePath)" target="_blank" class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-sm transition-all group">
-                <div class="flex items-center gap-4">
-                  <div class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                    <i class="far fa-file-pdf text-lg"></i>
-                  </div>
-                  <div>
-                    <div class="text-sm font-semibold text-gray-800">{{doc.documentType}}</div>
-                    <div class="text-[10px] text-gray-400">{{doc.uploadedAt | date:'medium'}}</div>
-                  </div>
-                </div>
-                <i class="fas fa-external-link-alt text-gray-200 group-hover:text-indigo-400 transition-colors"></i>
-              </a>
-              <div *ngIf="selectedRequest.documents.length === 0" class="text-center py-8 text-gray-400 italic text-sm">
-                No documents uploaded.
+          <!-- RIGHT COLUMN: Verification Engine -->
+          <div class="lg:col-span-7 space-y-6">
+            <div *ngFor="let doc of selectedRequest.documents" class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+               <!-- Document Header -->
+               <div class="p-6 border-b border-gray-50 flex items-center justify-between bg-white">
+                 <div class="flex items-center gap-4">
+                   <div class="h-12 w-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-xl shadow-inner">
+                     <i class="fas fa-file-pdf"></i>
+                   </div>
+                   <div>
+                     <h5 class="font-black text-gray-900 leading-tight">{{doc.documentType}}</h5>
+                     <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Digital Asset Verification</p>
+                   </div>
+                 </div>
+                 <a [href]="getFullDocumentUrl(doc.filePath)" target="_blank" class="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-green-600 transition-all shadow-lg shadow-gray-200">
+                   View Source <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
+                 </a>
+               </div>
+
+               <!-- Verification Engine Logic -->
+               <div class="p-6 bg-gradient-to-b from-white to-gray-50/50">
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <!-- Extracted Data Panel -->
+                   <div class="space-y-4">
+                     <h6 class="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                       <span class="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                       Extracted Data
+                     </h6>
+                     <div class="bg-white/50 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 space-y-3">
+                       <div class="flex justify-between items-center text-xs">
+                         <span class="text-gray-400 font-bold uppercase tracking-tighter">Extracted Holder</span>
+                         <span class="font-black text-gray-800">{{parseAiData(doc.extractedDataJson).newOwner || 'N/A'}}</span>
+                       </div>
+                       <div class="flex justify-between items-center text-xs">
+                         <span class="text-gray-400 font-bold uppercase tracking-tighter">Policy Reference</span>
+                         <span class="font-black text-gray-800">{{parseAiData(doc.extractedDataJson).policyNumber || 'N/A'}}</span>
+                       </div>
+                       <div class="flex justify-between items-center text-xs">
+                         <span class="text-gray-400 font-bold uppercase tracking-tighter">Effective Date</span>
+                         <span class="font-black text-gray-800">{{parseAiData(doc.extractedDataJson).date || 'N/A'}}</span>
+                       </div>
+                     </div>
+                   </div>
+
+                   <!-- Summary Panel -->
+                   <div class="space-y-4">
+                     <h6 class="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                       <i class="fas fa-sparkles text-amber-400"></i>
+                       Verification Engine
+                     </h6>
+                     <div class="text-sm text-gray-600 space-y-2 prose prose-sm leading-relaxed">
+                        {{doc.aiSummary}}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+            </div>
+
+            <div *ngIf="selectedRequest.documents.length === 0" class="bg-white border-2 border-dashed border-gray-100 rounded-[2rem] p-12 text-center">
+              <div class="h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-file-invoice text-gray-200 text-3xl"></i>
               </div>
+              <p class="text-gray-400 font-medium">No evidentiary documents provided.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
-        <button [disabled]="isProcessing" (click)="reject()" class="flex-1 py-3 bg-white border border-red-200 text-red-600 font-bold rounded-2xl hover:bg-red-50 transition-colors">
-          Reject Transfer
+      <!-- Action Footer -->
+      <div class="p-8 bg-white border-t border-gray-100 flex items-center justify-between">
+        <button [disabled]="isProcessing" (click)="closeModal()" class="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-2xl transition-all border border-gray-200">
+          Close Audit
         </button>
-        <button [disabled]="isProcessing" (click)="approve()" class="flex-[2] py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
-          <span *ngIf="isProcessing" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-          Approve & Finalize Transfer
-        </button>
+        <div class="flex gap-4">
+          <button [disabled]="isProcessing" (click)="reject()" class="px-8 py-3 bg-white border-2 border-red-100 text-red-500 font-black rounded-2xl hover:bg-red-50 transition-all">
+            Decline Transfer
+          </button>
+          <button [disabled]="isProcessing" (click)="approve()" class="px-10 py-4 bg-green-600 text-white font-black rounded-2xl hover:bg-green-700 shadow-xl shadow-green-100 transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center gap-3">
+            <span *ngIf="isProcessing" class="animate-spin h-5 w-5 border-3 border-white border-t-transparent rounded-full"></span>
+            Approve & Reassign Policy
+          </button>
+        </div>
       </div>
     </div>
   </div>

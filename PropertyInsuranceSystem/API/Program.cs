@@ -99,8 +99,8 @@ if (!Directory.Exists(wwwrootPath))
     Directory.CreateDirectory(wwwrootPath);
 }
 
-app.UseStaticFiles();
 app.UseCors("AllowAngular");
+app.UseStaticFiles();
 
 app.UseSwagger();
 app.UseSwaggerUI();

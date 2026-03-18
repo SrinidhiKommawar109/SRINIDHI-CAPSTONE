@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { PolicyTransferService, TransferRequest, TransferReason, TransferStatus } from '../../../../core/policy-transfer.service';
 import { PolicyRequestsService, PolicyRequest } from '../../../../core/policy-requests.service';
 import { NotificationsService } from '../../../../core/notifications.service';
+import { AiAnalysisService } from '../../../../core/ai-analysis.service';
+import * as Tesseract from 'tesseract.js';
+import * as pdfjsLib from 'pdfjs-dist';
+
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs';
 
 @Component({
   selector: 'app-customer-transfer-requests',
@@ -15,12 +20,15 @@ export class CustomerTransferRequestsComponent implements OnInit {
   private readonly transferService = inject(PolicyTransferService);
   private readonly policyService = inject(PolicyRequestsService);
   private readonly notifications = inject(NotificationsService);
+  private readonly aiService = inject(AiAnalysisService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   myRequests: TransferRequest[] = [];
   myPolicies: PolicyRequest[] = [];
   isLoading = false;
   isSubmitting = false;
+  isAnalyzing = false;
+  analysisProgress = '';
 
   showForm = false;
   currentStep = 1; // 1: Details, 2: Documents
@@ -135,37 +143,89 @@ export class CustomerTransferRequestsComponent implements OnInit {
     }
   }
 
-  uploadDocuments(): void {
+  async uploadDocuments(): Promise<void> {
     if (!this.createdRequestId) return;
 
-    const uploads = this.requiredDocuments.map(docType => {
+    const filesToUpload = this.requiredDocuments.map(docType => {
       const file = this.uploadedFiles[docType];
       if (!file) {
         this.notifications.show({ title: 'Error', message: `Please select ${docType}`, type: 'error' });
         return null;
       }
-      return this.transferService.uploadDocument(this.createdRequestId!, docType, file);
-    }).filter(u => u !== null);
+      return { type: docType, file: file };
+    }).filter(item => item !== null) as { type: string, file: File }[];
 
-    if (uploads.length < this.requiredDocuments.length) return;
-
+    if (filesToUpload.length === 0 || filesToUpload.length < this.requiredDocuments.length) {
+      this.notifications.show({ title: 'Error', message: 'Please ensure all required documents are selected.', type: 'error' });
+      return;
+    }
+    
     this.isSubmitting = true;
-    let completed = 0;
-    uploads.forEach(obs => {
-      obs?.subscribe({
-        next: () => {
-          completed++;
-          if (completed === uploads.length) {
-            this.finishUpload();
+    this.isAnalyzing = true;
+    this.analysisProgress = 'Starting document audit...';
+
+    try {
+      for (const fileItem of filesToUpload) {
+        this.analysisProgress = `Uploading ${fileItem.type}...`;
+        const uploadRes = await this.transferService.uploadDocument(
+          this.createdRequestId!, 
+          fileItem.type, 
+          fileItem.file
+        ).toPromise();
+
+        if (uploadRes) {
+          // 1. OCR Stage
+          this.analysisProgress = `Extracting text from ${fileItem.type}...`;
+          let extractedText = '';
+          
+          if (fileItem.file.type === 'application/pdf') {
+            extractedText = await this.extractTextFromPdf(fileItem.file);
+          } else {
+            const result = await Tesseract.recognize(fileItem.file, 'eng');
+            extractedText = result.data.text;
           }
-        },
-        error: () => {
-          this.isSubmitting = false;
-          this.notifications.show({ title: 'Error', message: 'Failed to upload some documents.', type: 'error' });
-          this.cdr.detectChanges();
+
+          // 2. AI Analysis Stage
+          this.analysisProgress = `Auditing content for ${fileItem.type}...`;
+          const analysisRes = await this.aiService.analyzeTransferDocument(extractedText, {
+            reason: this.newRequest.transferReason,
+            targetName: this.newRequest.newOwnerName
+          }).toPromise();
+
+          if (analysisRes) {
+            // 3. Save Analysis Stage
+            this.analysisProgress = `Saving audit results...`;
+            await this.transferService.saveDocumentAnalysis(uploadRes.documentId, {
+              extractedText: extractedText,
+              extractedDataJson: JSON.stringify(analysisRes.structuredData),
+              aiSummary: analysisRes.summary
+            }).toPromise();
+          }
         }
-      });
-    });
+      }
+
+      this.notifications.show({ title: 'Success', message: 'Transfer request submitted with automated audit!', type: 'success' });
+      this.finishUpload(); // Use existing finishUpload to close form and reload data
+    } catch (error) {
+      console.error('Error during document processing:', error);
+      this.notifications.show({ title: 'Error', message: 'Error during document processing', type: 'error' });
+    } finally {
+      this.isSubmitting = false;
+      this.isAnalyzing = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async extractTextFromPdf(file: File): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        fullText += textContent.items.map((item: any) => item.str).join(' ');
+    }
+    return fullText;
   }
 
   finishUpload(): void {

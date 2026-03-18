@@ -48,68 +48,96 @@ export class AiAnalysisService {
   // ===============================
   analyzeClaim(claimText: string, claimData: any): Observable<any> {
     const prompt = `
-Analyze the insurance claim below and prioritize the "Document Text" which contains data extracted from claim documents (e.g., invoices, FIR, medical reports).
-
-Return ONLY a JSON object with this structure:
-{
- "summary": ["point1","point2","point3","point4","point5"],
- "riskLevel": "Low | Medium | High",
- "riskReason": "short explanation in simple english"
-}
-
-Specific instructions for the summary points:
-- Point 1: Key data found in the DOCUMENT (e.g., specific amount cited, date, or names).
-- Point 2: Confirmation if the document supports the Incident Type (${claimData.incidentType}).
-- Point 3: Verification of the Claim Amount vs Documented Amount (₹${claimData.claimAmount}).
-- Point 4: Any specific details about the claimant or property mentioned in the document.
-- Point 5: Overall assessment of the documentation quality and consistency.
-
+Analyze this insurance claim for potential fraud and risk.
 Claim Details:
-Claim ID: ${claimData.id}
-Plan: ${claimData.policyRequest?.plan?.planName || 'N/A'}
-Incident Type: ${claimData.incidentType}
-Description: ${claimData.description}
-Claim Amount: ₹${claimData.claimAmount}
+- Incident Type: ${claimData.incidentType}
+- Description: ${claimData.description}
+- Property Address: ${claimData.propertyAddress}
+- Property Value: ${claimData.propertyValue}
+- Claim Amount: ${claimData.claimAmount}
 
-Document Text (EXTRACTED FROM PDF):
-${claimText || 'No document text found - Please flag as Medium Risk due to missing documentation.'}
+Extracted Document Content:
+${claimText.substring(0, 4000)}
+
+Tasks:
+1. Provide a short "Smart Summary" (max 3 bullet points) of the claim and the supporting evidence.
+2. Assess the Risk Level (Low, Medium, High).
+3. Provide a brief reason for the risk assessment.
+
+Respond ONLY with a JSON object:
+{
+  "summary": ["Point 1", "Point 2", "Point 3"],
+  "riskLevel": "Low/Medium/High",
+  "riskReason": "..."
+}
 `;
 
     const body = {
       model: this.groqModel,
       messages: [
-        {
-          role: 'system',
-          content: 'You are an insurance claim analyst. Always return valid JSON only.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
+        { role: 'system', content: 'You are an insurance claim adjuster. Always return valid JSON only.' },
+        { role: 'user', content: prompt }
       ],
-      temperature: 0.2,
-      max_tokens: 800
+      temperature: 0.1
     };
 
     return this.http.post(this.analyzeUrl, body).pipe(
       map((res: any) => {
         const content = res?.choices?.[0]?.message?.content;
-        if (!content) {
-          return this.getFallbackResponse('Empty AI response');
-        }
-
+        if (!content) return this.getFallbackResponse('No content from AI');
         const cleaned = content.replace(/```json|```/g, '').trim();
         try {
           return JSON.parse(cleaned);
         } catch (err) {
-          console.error('JSON Parse Error:', cleaned);
-          return this.getFallbackResponse('Invalid JSON returned by AI');
+          return this.getFallbackResponse('Error parsing AI response');
         }
       }),
-      catchError(err => {
-        console.error('Backend AI Proxy Error:', err);
-        const errorMessage = err?.error?.error?.message || err?.status || 'Unknown error';
-        return of(this.getFallbackResponse(`AI service error: ${errorMessage}`));
+      catchError(err => of(this.getFallbackResponse('Backend connection error')))
+    );
+  }
+
+  analyzeTransferDocument(extractedText: string, metadata: any): Observable<any> {
+    const prompt = `
+Analyze this document for a Policy Ownership Transfer.
+Request Type: ${metadata.reason}
+Target Owner Name: ${metadata.targetName}
+
+Document Content:
+${extractedText.substring(0, 4000)}
+
+Tasks:
+1. Extract these fields into a JSON object: {"newOwner": "...", "policyNumber": "...", "date": "..."}
+2. Provide a 3-point bulleted "Smart Summary" verifying if the document supports the transfer.
+3. Flag any name mismatches between the document and the Target Owner Name (${metadata.targetName}).
+
+Respond ONLY with a JSON object:
+{
+  "structuredData": {"newOwner": "...", "policyNumber": "...", "date": "..."},
+  "summary": "Point 1\\nPoint 2\\nPoint 3",
+  "isValid": true,
+  "validationMessage": "Document looks consistent."
+}
+`;
+
+    const body = {
+      model: this.groqModel,
+      messages: [
+        { role: 'system', content: 'You are an insurance document auditor. Always return valid JSON only.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.1
+    };
+
+    return this.http.post(this.analyzeUrl, body).pipe(
+      map((res: any) => {
+        const content = res?.choices?.[0]?.message?.content;
+        if (!content) return { summary: 'AI unavailable', structuredData: {}, isValid: false };
+        const cleaned = content.replace(/```json|```/g, '').trim();
+        try {
+          return JSON.parse(cleaned);
+        } catch (err) {
+          return { summary: 'Error parsing AI response', structuredData: {}, isValid: false };
+        }
       })
     );
   }
@@ -130,4 +158,4 @@ ${claimText || 'No document text found - Please flag as Medium Risk due to missi
       riskReason: reason
     };
   }
-}
+}

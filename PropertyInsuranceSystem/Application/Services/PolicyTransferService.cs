@@ -56,7 +56,7 @@ namespace Application.Services
             return transferRequest.Id;
         }
 
-        public async Task UploadTransferDocumentAsync(int transferRequestId, string documentType, string filePath)
+        public async Task<int> UploadTransferDocumentAsync(int transferRequestId, string documentType, string filePath)
         {
             var request = await _transferReadRepository.GetByIdAsync(transferRequestId);
             if (request == null) throw new InvalidOperationException("Transfer request not found.");
@@ -70,6 +70,7 @@ namespace Application.Services
             };
 
             await _transferReadRepository.AddDocumentAsync(document);
+            return document.Id;
         }
 
         public async Task<IEnumerable<TransferRequestResponseDto>> GetCustomerTransferRequestsAsync(int customerId)
@@ -156,6 +157,18 @@ namespace Application.Services
             await _notificationRepository.SaveChangesAsync();
         }
 
+        public async Task SaveDocumentAnalysisAsync(int documentId, string extractedText, string extractedDataJson, string aiSummary)
+        {
+            var document = await _transferReadRepository.GetDocumentByIdAsync(documentId);
+            if (document == null) throw new InvalidOperationException("Document not found.");
+
+            document.ExtractedText = extractedText;
+            document.ExtractedDataJson = extractedDataJson;
+            document.AiSummary = aiSummary;
+
+            await _transferReadRepository.UpdateDocumentAsync(document);
+        }
+
         private void ValidateDocuments(PolicyOwnershipTransfer request)
         {
             var docs = request.Documents.Select(d => d.DocumentType.ToLower()).ToList();
@@ -194,7 +207,10 @@ namespace Application.Services
                     Id = d.Id,
                     DocumentType = d.DocumentType,
                     FilePath = d.FilePath,
-                    UploadedAt = d.UploadedAt
+                    UploadedAt = d.UploadedAt,
+                    ExtractedText = d.ExtractedText,
+                    ExtractedDataJson = d.ExtractedDataJson,
+                    AiSummary = d.AiSummary
                 }).ToList()
             };
         }

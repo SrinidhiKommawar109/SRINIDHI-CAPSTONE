@@ -43,33 +43,36 @@ namespace API.Controllers
         }
 
         [HttpPost("upload-document")]
-        [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> UploadDocument([FromForm] UploadTransferDocumentDto dto)
+        public async Task<IActionResult> UploadDocument([FromForm] int transferRequestId, [FromForm] string documentType, IFormFile file)
+        {
+            if (file == null || file.Length == 0) return BadRequest("File is empty.");
+
+            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "transfer-docs");
+            if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var relativePath = $"/uploads/transfer-docs/{fileName}";
+            var documentId = await _transferService.UploadTransferDocumentAsync(transferRequestId, documentType, relativePath);
+
+            return Ok(new { documentId, filePath = relativePath, message = "Document uploaded successfully." });
+        }
+
+        [HttpPut("document/{id}/analysis")]
+        public async Task<IActionResult> SaveDocumentAnalysis(int id, [FromBody] SaveDocumentAnalysisDto dto)
         {
             try
             {
-                if (dto.File == null || dto.File.Length == 0)
-                    return BadRequest("No file uploaded.");
-
-                var baseRoot = _environment.WebRootPath ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
-                var uploadPath = Path.Combine(baseRoot, "uploads", "transfers");
-                if (!Directory.Exists(uploadPath))
-                    Directory.CreateDirectory(uploadPath);
-
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.File.FileName)}";
-                var filePath = Path.Combine(uploadPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await dto.File.CopyToAsync(stream);
-                }
-
-                var relativePath = $"/uploads/transfers/{fileName}";
-                await _transferService.UploadTransferDocumentAsync(dto.TransferRequestId, dto.DocumentType, relativePath);
-
-                return Ok(new { FilePath = relativePath, Message = "Document uploaded successfully." });
+                await _transferService.SaveDocumentAnalysisAsync(id, dto.ExtractedText, dto.ExtractedDataJson, dto.AiSummary);
+                return Ok(new { message = "Analysis results saved successfully." });
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

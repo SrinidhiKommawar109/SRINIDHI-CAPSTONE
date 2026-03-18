@@ -6,8 +6,10 @@ import {
     PolicyRequest,
     SubmitPropertyPayload,
 } from '../../../../core/policy-requests.service';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../../core/auth.service';
 import { NotificationsService } from '../../../../core/notifications.service';
+import * as L from 'leaflet';
 
 @Component({
     selector: 'app-customer-requests',
@@ -20,6 +22,12 @@ export class CustomerRequestsComponent implements OnInit {
     private readonly auth = inject(AuthService);
     private readonly notifications = inject(NotificationsService);
     private readonly cdr = inject(ChangeDetectorRef);
+    private readonly http = inject(HttpClient);
+
+    private map?: L.Map;
+    private marker?: L.Marker;
+    searchQuery = '';
+    isSearching = false;
 
     useWallet = false;
     walletBalance = 0;
@@ -213,8 +221,10 @@ export class CustomerRequestsComponent implements OnInit {
 
             if (req.status === 'AgentAssigned' || req.status === 'FormSent') {
                 this.currentStep = 2;
+                setTimeout(() => this.initMap(), 100);
             } else if (req.status === 'FormSubmitted') {
                 this.currentStep = 2;
+                setTimeout(() => this.initMap(), 100);
             } else if (req.status === 'RiskCalculated') {
                 this.currentStep = 3;
             } else {
@@ -234,8 +244,100 @@ export class CustomerRequestsComponent implements OnInit {
         if (step < this.currentStep) {
             this.currentStep = step;
             if (step < 4) this.showPaymentForm = false;
+            if (step === 2) {
+                setTimeout(() => this.initMap(), 100);
+            }
         }
         this.cdr.detectChanges();
+    }
+
+    initMap(): void {
+        if (this.map) {
+            this.map.remove();
+        }
+
+        // Fix for Leaflet default icon issues in Angular
+        const iconDefault = L.icon({
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28],
+            shadowSize: [41, 41]
+        });
+        L.Marker.prototype.options.icon = iconDefault;
+
+        const initialLat = 20.5937; // Center of India
+        const initialLng = 78.9629;
+
+        this.map = L.map('map-container').setView([initialLat, initialLng], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(this.map);
+
+        // Click on map to set address
+        this.map.on('click', (e: L.LeafletMouseEvent) => {
+            const { lat, lng } = e.latlng;
+            this.updateMarker(lat, lng);
+            this.reverseGeocode(lat, lng);
+        });
+    }
+
+    updateMarker(lat: number, lng: number): void {
+        if (this.marker) {
+            this.marker.setLatLng([lat, lng]);
+        } else if (this.map) {
+            this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+            this.marker.on('dragend', () => {
+                const position = this.marker?.getLatLng();
+                if (position) {
+                    this.reverseGeocode(position.lat, position.lng);
+                }
+            });
+        }
+        this.map?.setView([lat, lng], 15);
+    }
+
+    searchAddress(): void {
+        if (!this.searchQuery.trim()) return;
+
+        this.isSearching = true;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.searchQuery)}`;
+
+        this.http.get<any[]>(url).subscribe({
+            next: (results) => {
+                this.isSearching = false;
+                if (results && results.length > 0) {
+                    const first = results[0];
+                    const lat = parseFloat(first.lat);
+                    const lon = parseFloat(first.lon);
+                    this.updateMarker(lat, lon);
+                    this.submitPayload.propertyAddress = first.display_name;
+                    this.cdr.detectChanges();
+                } else {
+                    this.notifications.show({ title: 'Not Found', message: 'Address not found on map.', type: 'info' });
+                }
+            },
+            error: () => {
+                this.isSearching = false;
+                this.notifications.show({ title: 'Error', message: 'Failed to search address.', type: 'error' });
+            }
+        });
+    }
+
+    reverseGeocode(lat: number, lng: number): void {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+        this.http.get<any>(url).subscribe({
+            next: (result) => {
+                if (result && result.display_name) {
+                    this.submitPayload.propertyAddress = result.display_name;
+                    this.cdr.detectChanges();
+                }
+            }
+        });
     }
 
     submitProperty(): void {

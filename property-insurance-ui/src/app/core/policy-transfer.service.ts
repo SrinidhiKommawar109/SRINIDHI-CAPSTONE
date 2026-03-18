@@ -21,6 +21,9 @@ export interface TransferDocument {
   documentType: string;
   filePath: string;
   uploadedAt: Date;
+  extractedText?: string;
+  extractedDataJson?: string;
+  aiSummary?: string;
 }
 
 export interface TransferRequest {
@@ -56,13 +59,21 @@ export class PolicyTransferService {
     return this.http.post<{ requestId: number; message: string }>(`${this.baseUrl}/request`, payload);
   }
 
-  uploadDocument(requestId: number, documentType: string, file: File): Observable<{ filePath: string; message: string }> {
+  uploadDocument(requestId: number, documentType: string, file: File): Observable<{ documentId: number; filePath: string; message: string }> {
     const formData = new FormData();
     formData.append('transferRequestId', requestId.toString());
     formData.append('documentType', documentType);
     formData.append('file', file);
 
-    return this.http.post<{ filePath: string; message: string }>(`${this.baseUrl}/upload-document`, formData);
+    return this.http.post<{ documentId: number; filePath: string; message: string }>(`${this.baseUrl}/upload-document`, formData);
+  }
+
+  saveDocumentAnalysis(documentId: number, analysis: {
+    extractedText: string;
+    extractedDataJson: string;
+    aiSummary: string;
+  }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/document/${documentId}/analysis`, analysis);
   }
 
   getMyRequests(): Observable<TransferRequest[]> {

@@ -10,6 +10,8 @@ namespace Application.Interfaces
         Task<IEnumerable<PolicyOwnershipTransfer>> GetByCustomerIdAsync(int customerId);
         Task<IEnumerable<PolicyOwnershipTransfer>> GetPendingTransfersAsync();
         Task AddDocumentAsync(PolicyTransferDocument document);
+        Task<PolicyTransferDocument?> GetDocumentByIdAsync(int id);
+        Task UpdateDocumentAsync(PolicyTransferDocument document);
         Task<PolicyOwnershipTransfer> GetByIdWithDocumentsAsync(int id);
     }
 }

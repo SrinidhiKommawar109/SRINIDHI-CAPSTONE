@@ -85,7 +85,7 @@ export class AuthService {
   }
 
   register(request: RegisterRequest): Observable<any> {
-    const url = `${environment.apiBaseUrl}/Auth/register`;
+    const url = `${environment.apiBaseUrl}/Auth/register-new`;
     return this.http.post(url, request);
   }
 

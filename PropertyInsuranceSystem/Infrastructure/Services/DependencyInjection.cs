@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IPropertyPlanService, PropertyPlanService>();
         services.AddScoped<IPolicyTransferService, PolicyTransferService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IEmailService, EmailService>();
 
         return services;
     }

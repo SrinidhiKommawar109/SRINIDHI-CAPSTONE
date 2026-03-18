@@ -24,6 +24,7 @@ import { ClaimsPendingComponent } from './features/dashboard/claims/claims-pendi
 import { ClaimsHistoryComponent } from './features/dashboard/claims/claims-history/claims-history.component';
 import { CustomerTransferRequestsComponent } from './features/dashboard/customer/customer-transfer-requests/customer-transfer-requests.component';
 import { AdminTransferApprovalsComponent } from './features/dashboard/admin/admin-transfer-approvals/admin-transfer-approvals.component';
+import { AgentPoliciesComponent } from './features/dashboard/agent/agent-policies/agent-policies.component';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -54,6 +55,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'tasks', pathMatch: 'full' },
       { path: 'tasks', component: AgentTasksComponent },
+      { path: 'policies', component: AgentPoliciesComponent },
       { path: 'earnings', component: AgentEarningsComponent },
     ],
   },

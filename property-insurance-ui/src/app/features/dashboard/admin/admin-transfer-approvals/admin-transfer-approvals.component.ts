@@ -99,4 +99,13 @@ export class AdminTransferApprovalsComponent implements OnInit {
     if (path.startsWith('http')) return path;
     return `${this.apiBaseUrl}${path}`;
   }
+
+  parseAiData(json: string | undefined): any {
+    if (!json) return {};
+    try {
+      return JSON.parse(json);
+    } catch {
+      return {};
+    }
+  }
 }

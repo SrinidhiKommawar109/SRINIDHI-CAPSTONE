@@ -44,6 +44,17 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<PolicyTransferDocument?> GetDocumentByIdAsync(int id)
+        {
+            return await _context.PolicyTransferDocuments.FindAsync(id);
+        }
+
+        public async Task UpdateDocumentAsync(PolicyTransferDocument document)
+        {
+            _context.PolicyTransferDocuments.Update(document);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<PolicyOwnershipTransfer> GetByIdWithDocumentsAsync(int id)
         {
             return await _context.PolicyOwnershipTransfers

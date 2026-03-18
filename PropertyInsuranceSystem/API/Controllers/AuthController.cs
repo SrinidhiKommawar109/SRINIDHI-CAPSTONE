@@ -1,9 +1,10 @@
-﻿using Application.DTOs;
-using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using API.DTOs;
 using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+
 namespace API.Controllers;
 
 [ApiController]
@@ -11,10 +12,37 @@ namespace API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IEmailService _emailService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IEmailService emailService)
     {
         _authService = authService;
+        _emailService = emailService;
+    }
+
+    [HttpPost("register-new")]
+    public async Task<IActionResult> RegisterNew(RegisterDto request)
+    {
+        try 
+        {
+            var registerRequest = new RegisterRequestDto
+            {
+                FullName = request.FullName,
+                Email = request.Email,
+                Password = request.Password,
+                Role = string.IsNullOrEmpty(request.Role) ? "Customer" : request.Role,
+                ReferralCode = request.ReferralCode
+            };
+
+            await _authService.RegisterAsync(registerRequest);
+            await _emailService.SendWelcomeEmailAsync(request.Email, request.FullName);
+            
+            return Ok(new { message = "Registration successful and welcome email sent." });
+        }
+        catch (System.Exception ex)
+        {
+            return StatusCode(500, new { message = "Registration failed.", detail = ex.Message });
+        }
     }
 
     [HttpPost("register")]

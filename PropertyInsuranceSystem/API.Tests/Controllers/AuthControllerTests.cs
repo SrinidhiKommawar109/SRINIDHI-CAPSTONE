@@ -10,12 +10,14 @@ namespace API.Tests.Controllers
     public class AuthControllerTests
     {
         private readonly Mock<IAuthService> _mockAuthService;
+        private readonly Mock<IEmailService> _mockEmailService;
         private readonly AuthController _controller;
 
         public AuthControllerTests()
         {
             _mockAuthService = new Mock<IAuthService>();
-            _controller = new AuthController(_mockAuthService.Object);
+            _mockEmailService = new Mock<IEmailService>();
+            _controller = new AuthController(_mockAuthService.Object, _mockEmailService.Object);
         }
 
         [Fact]
