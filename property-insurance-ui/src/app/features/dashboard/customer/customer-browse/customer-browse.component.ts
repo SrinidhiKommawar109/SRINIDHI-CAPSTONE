@@ -23,7 +23,6 @@ export class CustomerBrowseComponent implements OnInit {
     plans: PropertyPlan[] = [];
     subCategories: any[] = [];
     selectedSubCategoryId: number = 0;
-    createMessage = '';
 
     ngOnInit(): void {
         this.loadPlans();
@@ -78,15 +77,12 @@ export class CustomerBrowseComponent implements OnInit {
 
     createRequestForPlan(planId: number): void {
         if (!planId) return;
-        this.createMessage = '';
         this.policies.createRequest(planId).subscribe({
             next: (msg) => {
-                this.createMessage = msg;
                 this.notifications.show({ title: 'Request created', message: 'Your policy request has been submitted.', type: 'success' });
             },
             error: (err) => {
-                this.createMessage = err?.error || 'Something went wrong.';
-                this.cdr.detectChanges();
+                this.notifications.show({ title: 'Error', message: err?.error || 'Something went wrong.', type: 'error' });
             },
         });
     }

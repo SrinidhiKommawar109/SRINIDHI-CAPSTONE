@@ -19,15 +19,27 @@ export class ClaimsPendingComponent implements OnInit {
     private readonly cdr = inject(ChangeDetectorRef);
 
     pendingClaims: Claim[] = [];
+    selectedClaim: Claim | null = null;
     claimRemarks: Record<number, string> = {};
     analysisResults: Record<number, any> = {};
     analyzing: Record<number, boolean> = {};
     loading = false;
+    isProcessing = false;
     errorMessage = '';
     readonly apiUrl = environment.apiBaseUrl.replace('/api', '');
 
     ngOnInit(): void {
         this.loadPending();
+    }
+
+    viewClaim(claim: Claim): void {
+        this.selectedClaim = claim;
+        this.cdr.detectChanges();
+    }
+
+    closeModal(): void {
+        this.selectedClaim = null;
+        this.cdr.detectChanges();
     }
 
     getPhotos(urls: string | undefined): string[] {
@@ -53,6 +65,7 @@ export class ClaimsPendingComponent implements OnInit {
     }
 
     verifyClaim(id: number, accepted: boolean): void {
+        this.isProcessing = true;
         this.claims
             .verifyClaim(id, {
                 isAccepted: accepted,
@@ -60,14 +73,17 @@ export class ClaimsPendingComponent implements OnInit {
             })
             .subscribe({
                 next: () => {
+                    this.isProcessing = false;
                     this.notifications.show({
                         title: accepted ? 'Claim approved' : 'Claim rejected',
                         message: `Claim #${id} processed.`,
                         type: accepted ? 'success' : 'info',
                     });
+                    this.selectedClaim = null;
                     this.loadPending();
                 },
                 error: (err) => {
+                    this.isProcessing = false;
                     this.errorMessage = this.extractError(err);
                     this.cdr.detectChanges();
                 },

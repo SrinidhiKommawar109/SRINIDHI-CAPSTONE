@@ -117,7 +117,7 @@ public class ApplicationDbContext : DbContext
             new PropertyPlans { Id = 1, PlanName = "Standard Home Protection", BaseCoverageAmount = 250000, CoverageRate = 0.005m, BasePremium = 1250, AgentCommission = 125, Frequency = PremiumFrequency.Yearly, SubCategoryId = 1 },
             new PropertyPlans { Id = 2, PlanName = "Smart Business Protect", BaseCoverageAmount = 1000000, CoverageRate = 0.008m, BasePremium = 8000, AgentCommission = 600, Frequency = PremiumFrequency.Quarterly, SubCategoryId = 2 },
             new PropertyPlans { Id = 3, PlanName = "Plant Safety Plan", BaseCoverageAmount = 5000000, CoverageRate = 0.012m, BasePremium = 60000, AgentCommission = 4500, Frequency = PremiumFrequency.HalfYearly, SubCategoryId = 3 },
-            new PropertyPlans { Id = 4, PlanName = "Luxury Plan � Signature Property Guard", BaseCoverageAmount = 750000, CoverageRate = 0.006m, BasePremium = 4500, AgentCommission = 400, Frequency = PremiumFrequency.Yearly, SubCategoryId = 1 }
+            new PropertyPlans { Id = 4, PlanName = "Luxury Plan Signature Property Guard", BaseCoverageAmount = 750000, CoverageRate = 0.006m, BasePremium = 4500, AgentCommission = 400, Frequency = PremiumFrequency.Yearly, SubCategoryId = 1 }
         );
     }
 }

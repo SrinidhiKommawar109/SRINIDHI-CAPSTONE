@@ -35,151 +35,262 @@
         <p class="text-sm text-slate-500 dark:text-slate-400">No pending claims found.</p>
     </div>
 
-    <div *ngIf="!loading && pendingClaims.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+    <div *ngIf="!loading && pendingClaims.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div *ngFor="let claim of pendingClaims"
-            class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 transition-all hover:shadow-md">
+            class="group relative rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 transition-all hover:shadow-xl hover:-translate-y-1">
+
             <div class="flex items-start justify-between mb-4">
-                <div>
-                    <span
-                        class="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 uppercase tracking-tight mb-2">
-                        Claim #{{ claim.id }}
-                    </span>
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">
-                        {{ claim.policyRequest?.plan?.planName || 'Standard Policy' }}
-                    </h3>
-                    <p class="text-[10px] text-slate-500 dark:text-slate-400">
-                        Assigned: {{ claim.assignedOfficer?.fullName || 'Auto-assigning...' }}
-                    </p>
+                <div
+                    class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <line x1="10" y1="9" x2="8" y2="9" />
+                    </svg>
                 </div>
                 <div class="text-right">
-                    <p class="text-xs font-bold text-emerald-600">₹{{ claim.claimAmount | number: '1.2-2' }}</p>
-                    <p class="text-[10px] text-slate-400">Requested Amount</p>
+                    <p class="text-xs font-black text-emerald-600">₹{{ claim.claimAmount | number: '1.2-2' }}</p>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Requested</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/50">
-                <div class="space-y-1">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Customer</p>
-                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{
-                        claim.policyRequest?.customer?.fullName || 'N/A' }}</p>
+            <div class="mb-6">
+                <div class="flex items-center gap-2 mb-1">
+                    <span
+                        class="text-[9px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-900/30">
+                        Claim #{{ claim.id }}
+                    </span>
                 </div>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Property Age</p>
-                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ claim.propertyAge }} Years</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                <div class="space-y-1">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Incident Date</p>
-                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ claim.incidentDate | date:'mediumDate' }}</p>
-                </div>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Incident Type</p>
-                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ claim.incidentType }}</p>
-                </div>
-            </div>
-
-            <div class="py-4 space-y-1 border-b border-slate-100 dark:border-slate-800/50">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description</p>
-                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {{ claim.description || 'No description provided.' }}
+                <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                    {{ claim.policyRequest?.plan?.planName || 'Standard Policy' }}
+                </h3>
+                <p class="text-[10px] text-slate-500 mt-1">
+                    Customer: <span class="font-bold text-slate-700 dark:text-slate-300">{{
+                        claim.policyRequest?.customer?.fullName }}</span>
                 </p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                <div class="space-y-1">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Event Location</p>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 italic leading-relaxed">
-                        {{ claim.propertyAddress }}
-                    </p>
+            <button (click)="viewClaim(claim)"
+                class="w-full py-3 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98]">
+                View & Action
+            </button>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div *ngIf="selectedClaim"
+        class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
+        <div
+            class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-5xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800">
+
+            <!-- Modal Header -->
+            <div
+                class="p-8 border-b border-slate-100 dark:border-slate-800/50 flex justify-between items-center bg-gradient-to-r from-emerald-50/50 to-transparent dark:from-emerald-900/10 relative">
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-1">
+                        <span
+                            class="px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-black rounded-lg uppercase tracking-wider">Review
+                            Phase</span>
+                        <h3 class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Claim Analysis
+                        </h3>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium">Registry ID: <span
+                            class="font-mono text-emerald-600 font-bold">CLM-{{selectedClaim.id}}</span> • Submitted on
+                        {{selectedClaim.claimSubmittedDate | date:'medium'}}</p>
                 </div>
-                <div class="space-y-1 text-right">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Submitted On</p>
-                    <p class="text-[10px] font-medium text-slate-500 dark:text-slate-500">{{ claim.claimSubmittedDate | date:'medium' }}</p>
-                </div>
+                <button (click)="closeModal()"
+                    class="h-12 w-12 rounded-2xl hover:bg-rose-50 hover:text-rose-500 flex items-center justify-center text-slate-400 transition-all duration-200 border border-transparent hover:border-rose-100 bg-slate-50 dark:bg-slate-800 dark:hover:bg-rose-900/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
 
-            <!-- Photos Section -->
-            <div *ngIf="getPhotos(claim.photoUrls).length > 0"
-                class="py-4 space-y-2 border-t border-slate-100 dark:border-slate-800/50">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Attached Photos</p>
-                <div class="flex flex-wrap gap-2">
-                    <div *ngFor="let photo of getPhotos(claim.photoUrls)"
-                        class="relative h-16 w-16 overflow-hidden rounded-lg bg-slate-100 group">
-                        <img [src]="apiUrl + photo"
-                            class="h-full w-full object-cover transition-transform group-hover:scale-110"
-                            alt="Claim Photo" />
-                        <a [href]="apiUrl + photo" target="_blank"
-                            class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="text-white">
-                                <path d="M15 3h6v6" />
-                                <path d="M10 14 21 3" />
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            <div class="flex-1 overflow-y-auto p-10 bg-slate-50/30 dark:bg-slate-950/20">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-            <div class="pt-4 space-y-3">
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">Assessment
-                        Remarks</label>
-                    <input type="text"
-                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50"
-                        [(ngModel)]="claimRemarks[claim.id]" placeholder="Internal notes..." />
-                </div>
+                    <!-- LEFT COLUMN: Context -->
+                    <div class="lg:col-span-5 space-y-8">
+                        <section
+                            class="bg-white dark:bg-slate-900/50 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Claim
+                                Narrative</h4>
+                            <div
+                                class="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
+                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed italic">
+                                    "{{selectedClaim.description || 'No description provided.'}}"
+                                </p>
+                            </div>
+                        </section>
 
-                <!-- AI Analysis Section -->
-                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/50">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Risk Assessment</h4>
-                        <button type="button" 
-                            class="text-[10px] font-bold text-sky-600 hover:text-sky-500 disabled:text-slate-400 flex items-center gap-1 transition-colors"
-                            [disabled]="analyzing[claim.id]"
-                            (click)="performAiAnalysis(claim)">
-                            <svg *ngIf="analyzing[claim.id]" class="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {{ analyzing[claim.id] ? 'Analyzing...' : 'Do AI Analysis' }}
-                        </button>
-                    </div>
+                        <section
+                            class="bg-white dark:bg-slate-900/50 p-8 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Asset &
+                                Incident Details</h4>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Property Value</p>
+                                    <p class="text-base font-black text-emerald-600">₹{{selectedClaim.propertyValue |
+                                        number}}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Property Age</p>
+                                    <p class="text-base font-black text-slate-800 dark:text-slate-200">
+                                        {{selectedClaim.propertyAge}} Years</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Incident Type</p>
+                                    <p class="text-base font-black text-slate-800 dark:text-slate-200">
+                                        {{selectedClaim.incidentType}}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Incident Date</p>
+                                    <p class="text-base font-black text-slate-800 dark:text-slate-200">
+                                        {{selectedClaim.incidentDate | date:'shortDate'}}</p>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Location</p>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    {{selectedClaim.propertyAddress}}</p>
+                            </div>
+                        </section>
 
-                    <div *ngIf="analysisResults[claim.id]" class="space-y-3 animate-in fade-in duration-300">
-                        <div class="flex items-center gap-2">
-                            <span [ngClass]="{
-                                'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': analysisResults[claim.id].riskLevel === 'Low',
-                                'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': analysisResults[claim.id].riskLevel === 'Medium',
-                                'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400': analysisResults[claim.id].riskLevel === 'High'
-                            }" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight">
-                                {{ analysisResults[claim.id].riskLevel }} Risk
-                            </span>
-                            <p class="text-[10px] text-slate-500 italic">{{ analysisResults[claim.id].riskReason }}</p>
+                        <div
+                            class="bg-white dark:bg-slate-900/50 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+                            <label
+                                class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Verification
+                                Notes</label>
+                            <textarea [(ngModel)]="claimRemarks[selectedClaim.id]" rows="3"
+                                class="w-full p-5 rounded-2xl border border-slate-100 dark:border-slate-800 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all text-sm font-medium dark:bg-slate-800"
+                                placeholder="Enter clinical assessment findings..."></textarea>
                         </div>
-                        
-                        <ul class="space-y-1.5">
-                            <li *ngFor="let point of analysisResults[claim.id].summary" class="flex items-start gap-2">
-                                <span class="mt-1.5 h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600 flex-shrink-0"></span>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-normal">{{ point }}</p>
-                            </li>
-                        </ul>
+                    </div>
+
+                    <!-- RIGHT COLUMN: AI Engine & Artifacts -->
+                    <div class="lg:col-span-7 space-y-8">
+                        <!-- AI Assessment Section -->
+                        <div
+                            class="overflow-hidden rounded-[2.5rem] bg-slate-100/50 p-1 shadow-xl border border-slate-200 dark:border-slate-800">
+                            <div class="relative bg-white dark:bg-slate-900 rounded-[2.3rem] p-8">
+                                <div class="flex items-center justify-between gap-6 mb-8">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 ring-1 ring-emerald-500/20">
+                                            <i class="fas fa-microchip animate-pulse"></i>
+                                        </div>
+                                        <div>
+                                            <h4
+                                                class="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">
+                                                Neural Engine</h4>
+                                            <p class="text-[9px] font-bold text-emerald-600 uppercase">AI Verification
+                                                Interface</p>
+                                        </div>
+                                    </div>
+                                    <button type="button"
+                                        class="group relative overflow-hidden rounded-xl bg-emerald-600 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-emerald-500 active:scale-95 disabled:opacity-50"
+                                        [disabled]="analyzing[selectedClaim.id]"
+                                        (click)="performAiAnalysis(selectedClaim)">
+                                        {{ analyzing[selectedClaim.id] ? 'Processing...' : 'Run Analysis' }}
+                                    </button>
+                                </div>
+
+                                <div *ngIf="analysisResults[selectedClaim.id]"
+                                    class="grid gap-6 md:grid-cols-[1fr_2fr] animate-in zoom-in-95 duration-500">
+                                    <div class="space-y-4">
+                                        <div
+                                            class="rounded-2xl bg-slate-50 dark:bg-white/5 p-4 ring-1 ring-slate-200 dark:ring-white/10">
+                                            <p class="text-[9px] font-black text-slate-500 mb-2 uppercase">Verdict</p>
+                                            <span [ngClass]="{
+                                                'text-emerald-600 bg-emerald-50 border-emerald-200': analysisResults[selectedClaim.id].riskLevel === 'Low',
+                                                'text-amber-600 bg-amber-50 border-amber-200': analysisResults[selectedClaim.id].riskLevel === 'Medium',
+                                                'text-rose-600 bg-rose-50 border-rose-200': analysisResults[selectedClaim.id].riskLevel === 'High'
+                                            }"
+                                                class="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-black uppercase">
+                                                <div class="h-1.5 w-1.5 rounded-full bg-current animate-pulse"></div>
+                                                {{ analysisResults[selectedClaim.id].riskLevel }} Risk
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="rounded-2xl bg-slate-50 dark:bg-white/5 p-6 ring-1 ring-slate-200 dark:ring-white/10">
+                                        <p class="text-[9px] font-black text-slate-500 mb-4 uppercase">Verification
+                                            Matrix</p>
+                                        <ul class="space-y-3">
+                                            <li *ngFor="let point of analysisResults[selectedClaim.id].summary"
+                                                class="flex gap-4 group/point">
+                                                <div
+                                                    class="flex-shrink-0 mt-1 h-3 w-3 rounded-full border-2 border-emerald-500/30 flex items-center justify-center group-hover/point:border-emerald-500">
+                                                    <div class="h-1 w-1 rounded-full bg-emerald-500"></div>
+                                                </div>
+                                                <p
+                                                    class="text-[11px] text-slate-600 dark:text-slate-400 leading-normal group-hover/point:text-slate-900 dark:group-hover/point:text-slate-200">
+                                                    {{ point }}</p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div *ngIf="!analysisResults[selectedClaim.id] && !analyzing[selectedClaim.id]"
+                                    class="py-12 flex flex-col items-center justify-center opacity-40">
+                                    <p
+                                        class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 dark:text-white">
+                                        Standby for Analysis</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Photo Artifacts -->
+                        <div
+                            class="bg-white dark:bg-slate-900/50 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Supporting
+                                PDF Documents</h4>
+                            <div *ngIf="getPhotos(selectedClaim.photoUrls).length > 0" class="flex flex-wrap gap-4">
+                                <div *ngFor="let photo of getPhotos(selectedClaim.photoUrls)"
+                                    class="relative h-24 w-24 overflow-hidden rounded-[1.25rem] bg-red-50 group shadow-sm hover:scale-105 transition-all flex items-center justify-center text-red-500 border border-red-100">
+                                    <i class="fas fa-file-pdf text-3xl"></i>
+                                    <a [href]="apiUrl + photo" target="_blank"
+                                        class="absolute inset-0 bg-red-600/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                            stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                            <path d="M15 3h6v6" />
+                                            <path d="M10 14 21 3" />
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                            <p *ngIf="getPhotos(selectedClaim.photoUrls).length === 0"
+                                class="text-center py-8 text-xs text-slate-400 font-bold uppercase tracking-widest italic">
+                                No supporting documents found</p>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="flex items-center gap-3">
-                    <button type="button"
-                        class="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-colors shadow-sm shadow-emerald-200 dark:shadow-none"
-                        (click)="verifyClaim(claim.id, true)">
-                        Approve
+            <!-- Modal Footer -->
+            <div
+                class="p-8 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div class="text-left">
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Total Payout Liability</p>
+                    <p class="text-2xl font-black text-emerald-600 tracking-tighter">₹{{selectedClaim.claimAmount |
+                        number:'1.2-2'}}</p>
+                </div>
+                <div class="flex gap-4">
+                    <button [disabled]="isProcessing" (click)="verifyClaim(selectedClaim.id, false)"
+                        class="px-8 py-4 bg-white dark:bg-slate-800 border-2 border-rose-100 dark:border-rose-900/50 text-rose-500 font-black rounded-2xl hover:bg-rose-50 transition-all text-[10px] uppercase tracking-widest">
+                        Decline Claim
                     </button>
-                    <button type="button"
-                        class="flex-1 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-500 transition-colors shadow-sm shadow-rose-200 dark:shadow-none"
-                        (click)="verifyClaim(claim.id, false)">
-                        Reject
+                    <button [disabled]="isProcessing" (click)="verifyClaim(selectedClaim.id, true)"
+                        class="px-12 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 shadow-xl shadow-emerald-500/20 transition-all transform hover:-translate-y-1 text-[10px] uppercase tracking-widest flex items-center gap-2">
+                        <span *ngIf="isProcessing"
+                            class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                        Authorize Payout
                     </button>
                 </div>
             </div>

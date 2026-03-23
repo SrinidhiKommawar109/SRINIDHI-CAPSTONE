@@ -2,6 +2,7 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClaimsService, CreateClaimPayload } from '../../../../core/claims.service';
+import { PolicyRequestsService, PolicyRequest } from '../../../../core/policy-requests.service';
 import { NotificationsService } from '../../../../core/notifications.service';
 
 @Component({
@@ -12,8 +13,11 @@ import { NotificationsService } from '../../../../core/notifications.service';
 })
 export class CustomerClaimsComponent {
     private readonly claims = inject(ClaimsService);
+    private readonly policyRequests = inject(PolicyRequestsService);
     private readonly notifications = inject(NotificationsService);
     private readonly cdr = inject(ChangeDetectorRef);
+
+    approvedPolicies: PolicyRequest[] = [];
 
     claimPayload: CreateClaimPayload = {
         policyRequestId: 0,
@@ -29,6 +33,32 @@ export class CustomerClaimsComponent {
     };
     claimMessage = '';
     selectedFileNames: string[] = [];
+
+    ngOnInit(): void {
+        this.loadApprovedPolicies();
+    }
+
+    loadApprovedPolicies(): void {
+        this.policyRequests.getMyRequests().subscribe({
+            next: (requests) => {
+                this.approvedPolicies = requests.filter(r => r.status === 'PolicyApproved');
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Failed to load policies', err);
+            }
+        });
+    }
+
+    onPolicySelect(): void {
+        const selectedId = Number(this.claimPayload.policyRequestId);
+        const policy = this.approvedPolicies.find(p => p.id === selectedId);
+        if (policy) {
+            this.claimPayload.propertyAddress = policy.propertyAddress || '';
+            this.claimPayload.propertyValue = policy.propertyValue || 0;
+            this.claimPayload.propertyAge = policy.propertyAge || 0;
+        }
+    }
 
     handleFileSelect(event: Event): void {
         const input = event.target as HTMLInputElement;
