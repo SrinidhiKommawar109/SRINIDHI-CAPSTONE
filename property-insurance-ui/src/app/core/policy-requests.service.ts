@@ -45,6 +45,7 @@ export interface PolicyRequest {
   planName?: string;
   agentName?: string;
   formType?: string;
+  propertyDetailsJson?: string;
 }
 
 export interface SubmitPropertyPayload {

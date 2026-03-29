@@ -6,6 +6,8 @@ using Application.Interfaces;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
+using Infrastructure.VertexAI.PolicyChat;
+using Application.PolicyChat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +52,7 @@ public static class DependencyInjection
         services.AddScoped<IPolicyTransferService, PolicyTransferService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IPolicyChatService, PolicyChatService>();
 
         return services;
     }

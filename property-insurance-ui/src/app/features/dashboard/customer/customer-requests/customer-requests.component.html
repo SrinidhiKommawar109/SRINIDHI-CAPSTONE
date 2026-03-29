@@ -141,20 +141,61 @@
                         <label
                             class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
                             Address</label>
-                        
-                        <!-- Search Box -->
-                        <div class="flex gap-2 mb-3">
-                            <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchAddress()"
-                                class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
-                                placeholder="Search for an address..." />
-                            <button (click)="searchAddress()" [disabled]="isSearching"
-                                class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-500 disabled:opacity-50">
-                                {{ isSearching ? '...' : 'Search' }}
-                            </button>
+
+                        <!-- Search Box with Autocomplete -->
+                        <div class="relative mb-3">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <input type="text" [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
+                                        (blur)="onSearchBlur()"
+                                        (focus)="showSuggestions = addressSuggestions.length > 0"
+                                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50"
+                                        placeholder="Start typing an address..." autocomplete="off" />
+
+                                    <div *ngIf="isSearching"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
+                                        <div
+                                            class="w-4 h-4 border-2 border-slate-300 border-t-emerald-500 rounded-full animate-spin">
+                                        </div>
+                                    </div>
+
+                                    <div *ngIf="!isSearching"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" class="text-slate-400">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Autocomplete Dropdown -->
+                            <div *ngIf="showSuggestions"
+                                class="absolute left-0 right-0 z-[1000] mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-64 overflow-y-auto w-full origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                                <ul class="py-2">
+                                    <li *ngFor="let suggestion of addressSuggestions"
+                                        (mousedown)="selectAddress(suggestion); $event.preventDefault()"
+                                        class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-100 dark:border-slate-700/50 last:border-0 flex items-start gap-3 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="w-4 h-4 text-emerald-500 mt-1 shrink-0" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                        <span class="text-sm text-slate-700 dark:text-slate-200">{{
+                                            suggestion.display_name }}</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
                         <!-- Map Container -->
-                        <div id="map-container" class="w-full h-[300px] rounded-xl border border-slate-200 mb-3 z-0 dark:border-slate-700 shadow-inner"></div>
+                        <div id="map-container"
+                            class="w-full h-[300px] rounded-xl border border-slate-200 mb-3 z-0 dark:border-slate-700 shadow-inner">
+                        </div>
 
                         <textarea rows="2" [(ngModel)]="submitPayload.propertyAddress" readonly
                             class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm focus:outline-none cursor-not-allowed dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400"
@@ -177,7 +218,7 @@
 
                 <!-- Residential Form -->
                 <div *ngIf="selectedFormType === 'Residential'"
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                     <div>
                         <label
                             class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
@@ -200,6 +241,20 @@
                         <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Number
                             of Floors</label>
                         <input type="number" [(ngModel)]="residentialForm.numberOfFloors"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Construction
+                            Type</label>
+                        <input type="text" [(ngModel)]="residentialForm.constructionType" placeholder="e.g. Concrete"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Occupancy
+                            Type</label>
+                        <input type="text" [(ngModel)]="residentialForm.occupancyType" placeholder="e.g. Owner occupied"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                     <div>
@@ -230,16 +285,60 @@
                             <option value="No">No</option>
                         </select>
                     </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Earthquake
+                            Zone</label>
+                        <select [(ngModel)]="residentialForm.earthquakeZone"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Prev
+                            Claims</label>
+                        <input type="number" [(ngModel)]="residentialForm.previousInsuranceClaims"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Renovation
+                            Year</label>
+                        <input type="number" [(ngModel)]="residentialForm.yearOfLastRenovation"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Fire
+                            Stn Dist</label>
+                        <input type="number" [(ngModel)]="residentialForm.nearbyFireStationDistance"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
                 </div>
 
                 <!-- Commercial Form -->
                 <div *ngIf="selectedFormType === 'Commercial'"
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
+                            Type</label>
+                        <input type="text" [(ngModel)]="commercialForm.propertyType" placeholder="e.g. Office Building"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
                     <div>
                         <label
                             class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Business
                             Type</label>
-                        <input type="text" [(ngModel)]="commercialForm.businessType"
+                        <input type="text" [(ngModel)]="commercialForm.businessType" placeholder="e.g. Retail, Office"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Built-up
+                            Area</label>
+                        <input type="number" [(ngModel)]="commercialForm.builtUpArea"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                     <div>
@@ -250,9 +349,71 @@
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                     <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Fire
+                            Safety Sys</label>
+                        <select [(ngModel)]="commercialForm.fireSafetySystem"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">CCTV
                             Available</label>
                         <select [(ngModel)]="commercialForm.securitySystemCCTV"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Flammable
+                            Storage</label>
+                        <select [(ngModel)]="commercialForm.storageOfFlammableMaterials"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Prev
+                            Claims</label>
+                        <input type="number" [(ngModel)]="commercialForm.previousInsuranceClaims"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Crime
+                            Rate</label>
+                        <select [(ngModel)]="commercialForm.crimeRateInArea"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Operating
+                            Hours</label>
+                        <input type="text" [(ngModel)]="commercialForm.businessOperatingHours"
+                            placeholder="e.g. 9 AM - 6 PM"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Backup
+                            Power</label>
+                        <select [(ngModel)]="commercialForm.backupPowerSystem"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Emergency
+                            Exit</label>
+                        <select [(ngModel)]="commercialForm.emergencyExitAvailable"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
@@ -262,12 +423,25 @@
 
                 <!-- Industrial Form -->
                 <div *ngIf="selectedFormType === 'Industrial'"
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
+                            Type</label>
+                        <input type="text" [(ngModel)]="industrialForm.propertyType" placeholder="e.g. Factory"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
                     <div>
                         <label
                             class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Industry
                             Type</label>
-                        <input type="text" [(ngModel)]="industrialForm.industryType"
+                        <input type="text" [(ngModel)]="industrialForm.industryType" placeholder="e.g. Manufacturing"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Workers
+                            #</label>
+                        <input type="number" [(ngModel)]="industrialForm.numberOfWorkers"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                     <div>
@@ -287,15 +461,79 @@
                             <option value="No">No</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Fire
+                            Protection</label>
+                        <select [(ngModel)]="industrialForm.fireProtectionSystem"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Safety
+                            Cert.</label>
+                        <select [(ngModel)]="industrialForm.safetyComplianceCertification"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Accident
+                            History</label>
+                        <input type="number" [(ngModel)]="industrialForm.accidentHistory"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Fire
+                            Stn Dist</label>
+                        <input type="number" [(ngModel)]="industrialForm.distanceToFireStation"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Security
+                            System</label>
+                        <select [(ngModel)]="industrialForm.securitySystemAvailable"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Working
+                            Hours</label>
+                        <input type="text" [(ngModel)]="industrialForm.workingHours" placeholder="e.g. 24/7"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Env.
+                            Risk</label>
+                        <select [(ngModel)]="industrialForm.environmentalRisk"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Contents Form -->
                 <div *ngIf="selectedFormType === 'Contents'"
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Property
+                            Location</label>
+                        <input type="text" [(ngModel)]="contentsForm.propertyLocation" placeholder="e.g. Warehouse A"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
                     <div>
                         <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Content
                             Type</label>
-                        <input type="text" [(ngModel)]="contentsForm.contentType"
+                        <input type="text" [(ngModel)]="contentsForm.contentType" placeholder="e.g. Electronics"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                     <div>
@@ -305,6 +543,27 @@
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                     <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Items
+                            #</label>
+                        <input type="number" [(ngModel)]="contentsForm.numberOfItems"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Storage
+                            Type</label>
+                        <input type="text" [(ngModel)]="contentsForm.storageType" placeholder="e.g. Racks"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Fire
+                            Protection</label>
+                        <select [(ngModel)]="contentsForm.fireProtectionSystem"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Theft
                             Protection</label>
                         <select [(ngModel)]="contentsForm.theftProtection"
@@ -312,6 +571,64 @@
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Prev
+                            Theft Claims</label>
+                        <input type="number" [(ngModel)]="contentsForm.previousTheftClaims"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Water
+                            Damage Prot.</label>
+                        <select [(ngModel)]="contentsForm.waterDamageProtection"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Backup
+                            Power</label>
+                        <select [(ngModel)]="contentsForm.backupPowerSystem"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Temp
+                            Controlled</label>
+                        <select [(ngModel)]="contentsForm.temperatureControlledStorage"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Inventory
+                            Turnover</label>
+                        <input type="text" [(ngModel)]="contentsForm.inventoryTurnoverFrequency"
+                            placeholder="e.g. Monthly"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Building
+                            Security</label>
+                        <select [(ngModel)]="contentsForm.buildingSecurityLevel"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 block">Claim
+                            History</label>
+                        <input type="number" [(ngModel)]="contentsForm.claimHistory"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none dark:bg-slate-800 dark:border-slate-700" />
                     </div>
                 </div>
 

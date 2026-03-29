@@ -79,6 +79,11 @@
                 (click)="createRequestForPlan(plan.id)">
                 Request Plan
             </button>
+            <button type="button"
+                class="mt-2 w-full inline-flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-slate-800 dark:text-emerald-400 border border-emerald-100 dark:border-slate-700 px-4 py-2.5 text-xs font-bold transition-all hover:bg-emerald-100 dark:hover:bg-slate-700 active:scale-95 focus:ring-2 focus:ring-emerald-500/20"
+                (click)="askAssistantForPlan(plan)">
+                <i class="fa fa-robot mr-2"></i> Get Details
+            </button>
         </div>
     </div>
 
@@ -95,4 +100,7 @@
         <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">No plans found</h3>
         <p class="text-slate-500 text-xs mt-1">Try adjusting your category filter.</p>
     </div>
+
+    <!-- Policy Assistant Chatbot -->
+    <app-chatbot></app-chatbot>
 </div>

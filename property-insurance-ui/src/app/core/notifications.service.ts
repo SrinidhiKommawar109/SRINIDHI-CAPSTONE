@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, interval, switchMap, startWith, filter, map, tap } from 'rxjs';
+import { BehaviorSubject, interval, switchMap, startWith, filter, map, tap, catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -46,7 +46,8 @@ export class NotificationsService {
 
   fetchNotifications() {
     return this.http.get<NotificationMessage[]>(`${this.apiBaseUrl}/Notifications`).pipe(
-      tap(msgs => this.messagesSubject.next(msgs))
+      tap(msgs => this.messagesSubject.next(msgs)),
+      catchError(() => of([]))
     );
   }
 

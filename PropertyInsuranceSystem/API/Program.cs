@@ -73,6 +73,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+// 1. Add MemoryCache if you haven't already
+builder.Services.AddMemoryCache();
+
+// 2. Register the Chatbot Service
 
 
 // ✅ MOVE CORS HERE (before Build)

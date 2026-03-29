@@ -1,6 +1,8 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import {
     PolicyRequestsService,
     PolicyRequest,
@@ -28,6 +30,11 @@ export class CustomerRequestsComponent implements OnInit {
     private marker?: L.Marker;
     searchQuery = '';
     isSearching = false;
+
+    // Autocomplete state
+    searchSubject = new Subject<string>();
+    addressSuggestions: any[] = [];
+    showSuggestions = false;
 
     useWallet = false;
     walletBalance = 0;
@@ -179,6 +186,29 @@ export class CustomerRequestsComponent implements OnInit {
     ngOnInit(): void {
         this.loadMyRequests();
         this.walletBalance = this.auth.getReferralBalance();
+
+        // Setup address autocomplete
+        this.searchSubject.pipe(
+            debounceTime(500),
+            distinctUntilChanged(),
+            switchMap(query => {
+                if (!query.trim()) {
+                    return of([]);
+                }
+                this.isSearching = true;
+                this.cdr.detectChanges();
+
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
+                return this.http.get<any[]>(url).pipe(
+                    catchError(() => of([]))
+                );
+            })
+        ).subscribe(results => {
+            this.isSearching = false;
+            this.addressSuggestions = results || [];
+            this.showSuggestions = this.addressSuggestions.length > 0;
+            this.cdr.detectChanges();
+        });
     }
 
     loadMyRequests(): void {
@@ -326,6 +356,31 @@ export class CustomerRequestsComponent implements OnInit {
                 this.notifications.show({ title: 'Error', message: 'Failed to search address.', type: 'error' });
             }
         });
+    }
+
+    onSearchInput(event: any): void {
+        const value = event.target.value;
+        this.searchQuery = value;
+        this.searchSubject.next(value);
+    }
+
+    selectAddress(address: any): void {
+        this.searchQuery = address.display_name;
+        this.submitPayload.propertyAddress = address.display_name;
+        this.showSuggestions = false;
+
+        const lat = parseFloat(address.lat);
+        const lon = parseFloat(address.lon);
+        this.updateMarker(lat, lon);
+        this.cdr.detectChanges();
+    }
+
+    onSearchBlur(): void {
+        // Delay hiding suggestions so that click event on suggestion can fire
+        setTimeout(() => {
+            this.showSuggestions = false;
+            this.cdr.detectChanges();
+        }, 200);
     }
 
     reverseGeocode(lat: number, lng: number): void {

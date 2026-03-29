@@ -18,6 +18,7 @@ export class AgentTasksComponent implements OnInit {
     loading = false;
     lastRisk: CalculateRiskResponse | null = null;
     selectedRequestDetails: PolicyRequest | null = null;
+    parsedDetails: any = null;
     errorMessage = '';
     calculatingRequestId: number | null = null;
 
@@ -111,10 +112,25 @@ export class AgentTasksComponent implements OnInit {
 
     viewDetails(req: PolicyRequest): void {
         this.selectedRequestDetails = req;
+        this.parsedDetails = null;
+        if (req.propertyDetailsJson) {
+            try {
+                this.parsedDetails = JSON.parse(req.propertyDetailsJson);
+            } catch (e) {
+                console.error('Failed to parse property details JSON', e);
+            }
+        }
     }
 
     closeDetails(): void {
         this.selectedRequestDetails = null;
+        this.parsedDetails = null;
+    }
+
+    formatKey(key: any): string {
+        const str = String(key);
+        const result = str.replace(/([A-Z])/g, ' $1');
+        return result.charAt(0).toUpperCase() + result.slice(1);
     }
 
     private extractError(err: any): string {

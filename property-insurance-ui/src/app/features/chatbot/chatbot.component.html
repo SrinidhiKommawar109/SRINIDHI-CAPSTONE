@@ -1,0 +1,62 @@
+<div class="chatbot-container">
+  <!-- Chat Window -->
+  <div class="chat-window glass-panel" *ngIf="isOpen">
+    <div class="chat-header emerald-bg">
+      <div class="header-content">
+        <i class="fa fa-robot bot-icon"></i>
+        <div>
+          <h3>Policy Assistant</h3>
+          <span class="status-indicator">Online</span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggleChat()">
+        <i class="fa fa-minus"></i>
+      </button>
+    </div>
+
+    <div class="chat-messages" #scrollMe>
+      <div 
+        class="message-wrapper" 
+        *ngFor="let msg of messages"
+        [ngClass]="msg.isBot ? 'bot-wrapper' : 'user-wrapper'">
+        
+        <div class="avatar" *ngIf="msg.isBot">
+          <i class="fa fa-robot"></i>
+        </div>
+        
+        <div class="message-bubble" [ngClass]="msg.isBot ? 'bot-bubble glass-light' : 'user-bubble emerald-gradient'">
+          <p>{{ msg.text }}</p>
+          <span class="time">{{ msg.time | date:'shortTime' }}</span>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div class="message-wrapper bot-wrapper" *ngIf="isLoading">
+        <div class="avatar">
+          <i class="fa fa-robot"></i>
+        </div>
+        <div class="message-bubble bot-bubble glass-light loading-bubble">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area border-t">
+      <input 
+        type="text" 
+        [(ngModel)]="userInput" 
+        (keyup.enter)="sendMessage()"
+        placeholder="Type your question here..." 
+        [disabled]="isLoading"
+        class="chat-input"
+      />
+      <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading">
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>

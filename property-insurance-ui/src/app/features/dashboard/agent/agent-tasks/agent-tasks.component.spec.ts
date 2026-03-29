@@ -14,9 +14,10 @@ describe('AgentTasksComponent', () => {
     let mockNotificationsService: any;
 
     beforeEach(async () => {
+        vi.useFakeTimers();
         mockPolicyService = {
             getAgentAssigned: vi.fn(() => of([])),
-            sendForm: vi.fn(() => of({})),
+            sendForm: vi.fn(() => of('Form Sent')),
             calculateRisk: vi.fn(() => of({}))
         };
 
@@ -38,19 +39,26 @@ describe('AgentTasksComponent', () => {
         fixture.detectChanges();
     });
 
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     it('should create', () => {
         expect(component).toBeTruthy();
         expect(mockPolicyService.getAgentAssigned).toHaveBeenCalled();
     });
 
     it('should send form', () => {
-        component.sendForm(1);
-        expect(mockPolicyService.sendForm).toHaveBeenCalledWith(1);
+        component.selectedFormRequestId = 1;
+        component.selectedFormType = 'Residential';
+        component.confirmSendForm();
+        expect(mockPolicyService.sendForm).toHaveBeenCalledWith(1, 'Residential');
         expect(mockNotificationsService.show).toHaveBeenCalled();
     });
 
     it('should calculate risk', () => {
         component.calculateRisk(1);
+        vi.advanceTimersByTime(2500);
         expect(mockPolicyService.calculateRisk).toHaveBeenCalledWith(1);
         expect(mockNotificationsService.show).toHaveBeenCalled();
     });

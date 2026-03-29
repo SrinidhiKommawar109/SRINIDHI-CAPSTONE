@@ -8,6 +8,7 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AiController : ControllerBase
     {
+        // To make HTTP calls to external APIs created using IHttpClientFactory
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 

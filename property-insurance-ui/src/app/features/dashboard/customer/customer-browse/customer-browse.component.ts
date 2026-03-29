@@ -7,17 +7,20 @@ import {
 } from '../../../../core/policy-requests.service';
 import { AdminService } from '../../../../core/admin.service';
 import { NotificationsService } from '../../../../core/notifications.service';
+import { ChatbotComponent } from '../../../chatbot/chatbot.component';
+import { ChatbotService } from '../../../chatbot/chatbot.service';
 
 @Component({
     selector: 'app-customer-browse',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, ChatbotComponent],
     templateUrl: './customer-browse.component.html',
 })
 export class CustomerBrowseComponent implements OnInit {
     private readonly policies = inject(PolicyRequestsService);
     private readonly adminService = inject(AdminService);
     private readonly notifications = inject(NotificationsService);
+    private readonly chatbotService = inject(ChatbotService);
     private readonly cdr = inject(ChangeDetectorRef);
 
     plans: PropertyPlan[] = [];
@@ -85,5 +88,10 @@ export class CustomerBrowseComponent implements OnInit {
                 this.notifications.show({ title: 'Error', message: err?.error || 'Something went wrong.', type: 'error' });
             },
         });
+    }
+
+    askAssistantForPlan(plan: PropertyPlan): void {
+        const { agentCommission, ...planWithoutCommission } = plan;
+        this.chatbotService.setContext(planWithoutCommission, `Explain about ${plan.planName}`);
     }
 }
